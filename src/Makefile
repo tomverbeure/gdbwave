@@ -5,6 +5,9 @@ LIB_FILES   = -lfstapi -lz
 
 CXXFLAGS    += -I. -L./fst
 
+all: gdbwave
+	./gdbwave
+
 gdbwave: fst/libfstapi.a $(OBJ_FILES)
 	$(CXX) $(CXXFLAGS)  -o $@ $(OBJ_FILES) $(LIB_FILES)
 
