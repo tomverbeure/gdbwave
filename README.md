@@ -31,6 +31,12 @@ General plan:
 
     `num_facs = fstReaderGetVarCount(ctx);`
 
+* what is `doubleEndianMatchState`? 
+
+* what is `valudChangeSectionCount`? 
+
+    How do I use it?
+
 * what is a dumpActivityChange?
 
     Does it have to do with times where values are not recorded?
