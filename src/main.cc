@@ -11,7 +11,7 @@ using namespace std;
 char fstFileName[] = "../test_data/top.fst";
 //char fstFileName[] = "../../vexriscv_ocd_blog/tb_ocd/top.fst";
 
-string clk_scope = "TOP.top.u_vex.cp";
+string clk_scope = "TOP.top.u_vex.cpu";
 string clk_name = "clk";
 fstHandle clk_handle = -1;
 
@@ -50,10 +50,7 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
 
 int main(int argc, char **argv)
 {
-    void *fstCtx;
-
     FstProcess  fstProc(fstFileName);
-    fstCtx = fstProc.fstCtx;
 
     cout << fstProc.infoStr();
 
@@ -63,7 +60,9 @@ int main(int argc, char **argv)
 
     CpuTrace    cpuTrace(fstProc, clk_sig, retired_pc_valid_sig, retired_pc_sig);
 
-    exit(0);
+#if 0
+    void *fstCtx;
+    fstCtx = fstProc.fstCtx;
 
     int numHierVars = 0;
 
@@ -133,19 +132,7 @@ int main(int argc, char **argv)
         ++hierCntr;
 
     }
-
-#if 0
-    for(int varIdx=0; varIdx<varCount; ++varIdx){
-        cout << "varIdx(" << varIdx << "/" << varCount << ")" << endl;
-    }
 #endif
-
-//    fstReaderSetFacProcessMaskAll(fstCtx);
-    fstReaderSetFacProcessMask(fstCtx, clk_handle);
-    fstReaderSetFacProcessMask(fstCtx, retired_pc_valid_handle);
-    fstReaderSetFacProcessMask(fstCtx, retired_pc_handle);
-    fstReaderIterBlocks2(fstCtx, fst_callback, fst_callback2, fstCtx, NULL); 
-
 
     return 0;
 }

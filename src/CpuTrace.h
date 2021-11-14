@@ -5,6 +5,12 @@
 
 #include <FstProcess.h>
 
+struct PcValue
+{
+    uint64_t    time;
+    uint64_t    pc;
+};
+
 class CpuTrace
 {
 public:
@@ -16,6 +22,8 @@ public:
     FstSignal       clk;
     FstSignal       pcValid;
     FstSignal       pc;
+
+    vector<PcValue>     pcTrace;
 };
 
 #endif

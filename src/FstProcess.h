@@ -47,6 +47,15 @@ public:
     string infoStr(void);
 
     bool assignHandles(vector<FstSignal> &signals);
+    void getValueChanges(vector<FstSignal> signals, void (*valueChangedCB)(uint64_t time, FstSignal &signal, const unsigned char *value));
+
+    struct FstCallbackInfo {
+        map<fstHandle,FstSignal &> handle2Signal;
+        void (*valueChangedCB)(uint64_t time, FstSignal &signal, const unsigned char *value);
+    };
+
+    static void fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value, uint32_t len);
+    static void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value);
 
 //private:
     string  fstFileName;

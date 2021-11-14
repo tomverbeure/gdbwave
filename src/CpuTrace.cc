@@ -23,9 +23,11 @@ CpuTrace::CpuTrace(FstProcess & fstProc, FstSignal clk, FstSignal pcValid, FstSi
         exit(-1);
     }
 
-    for(auto sig : sigs){
-        cout << sig.scopeName << "," << sig.name << "," << sig.hasHandle << "," << sig.handle << endl;
-    }
+    fstProc.getValueChanges(sigs, 
+        [](uint64_t time, FstSignal &signal, const unsigned char *value){
+            cout << time << "," << signal.name << "," << value << endl;
+        });
+
 }
 
 void CpuTrace::findNextPcValue(uint64_t startTime, uint64_t pc_value)

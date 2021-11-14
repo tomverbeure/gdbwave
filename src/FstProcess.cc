@@ -4,7 +4,6 @@
 
 #include "FstProcess.h"
 
-
 FstProcess::FstProcess(string fstFileName) :
     fstFileName(fstFileName)
 {
@@ -113,3 +112,33 @@ bool FstProcess::assignHandles(vector<FstSignal> &signals)
 
     return !sigNotFound;
 }
+
+void FstProcess::fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle sigHandle, const unsigned char *value, uint32_t len)
+{
+    throw runtime_error("callback2 not supported.");
+}
+
+void FstProcess::fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle sigHandle, const unsigned char *value)
+{
+    struct FstCallbackInfo *cbInfo = (struct FstCallbackInfo *)user_callback_data_pointer;
+    map<fstHandle,FstSignal &>::iterator it = cbInfo->handle2Signal.find(sigHandle);
+
+    cbInfo->valueChangedCB(time, it->second, value);
+}
+
+void FstProcess::getValueChanges(vector<FstSignal> signals, void (*valueChangedCB)(uint64_t time, FstSignal &signal, const unsigned char *value))
+{
+    struct FstCallbackInfo cbInfo;
+    cbInfo.valueChangedCB   = valueChangedCB;
+
+    fstReaderClrFacProcessMaskAll(fstCtx);
+
+    for(auto & sig: signals){
+        fstReaderSetFacProcessMask(fstCtx, sig.handle);
+        cbInfo.handle2Signal.insert({sig.handle, sig});
+    }
+
+    fstReaderIterBlocks2(fstCtx, FstProcess::fst_callback, FstProcess::fst_callback2, (void *)&cbInfo, NULL); 
+}
+
+
