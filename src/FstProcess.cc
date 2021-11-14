@@ -67,7 +67,7 @@ string FstProcess::infoStr(void)
 
 // For a given list of signals, look for and assign the fstHandle
 // Return true if all signals are found. 
-bool FstProcess::assignHandles(vector<FstSignal> &signals)
+bool FstProcess::assignHandles(vector<FstSignal *> &signals)
 {
     struct fstHier *hier;
     string curScopeName; 
@@ -94,14 +94,14 @@ bool FstProcess::assignHandles(vector<FstSignal> &signals)
                 //cout << "curName: " << curName << endl;
 
                 sigNotFound = false;
-                for(auto & sig: signals){
-                    if (sig.hasHandle)
+                for(auto sig: signals){
+                    if (sig->hasHandle)
                         continue;
                     sigNotFound     = true;
 
-                    if (sig.scopeName == curScopeName && sig.name == curName){
-                        sig.hasHandle   = true;
-                        sig.handle      = hier->u.var.handle;
+                    if (sig->scopeName == curScopeName && sig->name == curName){
+                        sig->hasHandle   = true;
+                        sig->handle      = hier->u.var.handle;
                     }
                 }
                 break;
@@ -121,24 +121,27 @@ void FstProcess::fst_callback2(void *user_callback_data_pointer, uint64_t time, 
 void FstProcess::fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle sigHandle, const unsigned char *value)
 {
     struct FstCallbackInfo *cbInfo = (struct FstCallbackInfo *)user_callback_data_pointer;
-    map<fstHandle,FstSignal &>::iterator it = cbInfo->handle2Signal.find(sigHandle);
+    map<fstHandle,FstSignal *>::iterator it = cbInfo->handle2Signal.find(sigHandle);
 
-    cbInfo->valueChangedCB(time, it->second, value);
+    cbInfo->valueChangedCB(time, it->second, value, cbInfo->userInfo);
 }
 
-void FstProcess::getValueChanges(vector<FstSignal> signals, void (*valueChangedCB)(uint64_t time, FstSignal &signal, const unsigned char *value))
+void FstProcess::getValueChanges(
+                    vector<FstSignal *> signals, 
+                    void (*valueChangedCB)(uint64_t time, FstSignal *signal, const unsigned char *value, void *userInfo), 
+                    void *userInfo)
 {
     struct FstCallbackInfo cbInfo;
     cbInfo.valueChangedCB   = valueChangedCB;
+    cbInfo.userInfo         = userInfo;
 
     fstReaderClrFacProcessMaskAll(fstCtx);
 
-    for(auto & sig: signals){
-        fstReaderSetFacProcessMask(fstCtx, sig.handle);
-        cbInfo.handle2Signal.insert({sig.handle, sig});
+    for(auto sig: signals){
+        fstReaderSetFacProcessMask(fstCtx, sig->handle);
+        cbInfo.handle2Signal.insert({sig->handle, sig});
     }
 
     fstReaderIterBlocks2(fstCtx, FstProcess::fst_callback, FstProcess::fst_callback2, (void *)&cbInfo, NULL); 
 }
-
 
