@@ -3,7 +3,7 @@
 
 #include <fst/fstapi.h>
 
-#include "CpuModel.h"
+#include "CpuTrace.h"
 #include "FstProcess.h"
 
 using namespace std;
@@ -11,16 +11,16 @@ using namespace std;
 char fstFileName[] = "../test_data/top.fst";
 //char fstFileName[] = "../../vexriscv_ocd_blog/tb_ocd/top.fst";
 
-string clk_scope = "TOP.top.u_vex.cpu";
-string clk_value = "clk";
+string clk_scope = "TOP.top.u_vex.cp";
+string clk_name = "clk";
 fstHandle clk_handle = -1;
 
 string retired_pc_scope = "TOP.top.u_vex.cpu";
-string retired_pc_value = "lastStagePc";
+string retired_pc_name = "lastStagePc";
 fstHandle retired_pc_handle = -1;
 
 string retired_pc_valid_scope = "TOP.top.u_vex.cpu";
-string retired_pc_valid_value = "lastStageIsValid";
+string retired_pc_valid_name = "lastStageIsValid";
 fstHandle retired_pc_valid_handle = -1;
 
 void fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value, uint32_t len)
@@ -32,7 +32,7 @@ void fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle tx
     cout << "    facidx(" << txidx << ")" << endl;
     cout << "    len(" << len << ")" << endl;
 
-    for(int i=0; i< len; ++i){
+    for(uint32_t i=0; i< len; ++i){
     }
 }
 
@@ -52,10 +52,18 @@ int main(int argc, char **argv)
 {
     void *fstCtx;
 
-    FstProcess fstProc(fstFileName);
+    FstProcess  fstProc(fstFileName);
     fstCtx = fstProc.fstCtx;
 
     cout << fstProc.infoStr();
+
+    FstSignal clk_sig(clk_scope, clk_name);
+    FstSignal retired_pc_sig(retired_pc_scope, retired_pc_name);
+    FstSignal retired_pc_valid_sig(retired_pc_valid_scope, retired_pc_valid_name);
+
+    CpuTrace    cpuTrace(fstProc, clk_sig, retired_pc_valid_sig, retired_pc_sig);
+
+    exit(0);
 
     int numHierVars = 0;
 
@@ -102,17 +110,17 @@ int main(int argc, char **argv)
                 cout << "    var.handle(" << hier->u.var.handle << ")" << endl;
                 cout << "    numHierVars(" << numHierVars << ")" << endl;
 
-                if (clk_scope == cur_scope_name && clk_value == hier->u.var.name){
+                if (clk_scope == cur_scope_name && clk_name == hier->u.var.name){
                     cout << "CLK MATCH!!!" << endl;
                     clk_handle   = hier->u.var.handle;
                 }
 
-                if (retired_pc_scope == cur_scope_name && retired_pc_value == hier->u.var.name){
+                if (retired_pc_scope == cur_scope_name && retired_pc_name == hier->u.var.name){
                     cout << "PC MATCH!!!" << endl;
                     retired_pc_handle   = hier->u.var.handle;
                 }
 
-                if (retired_pc_valid_scope == cur_scope_name && retired_pc_valid_value == hier->u.var.name){
+                if (retired_pc_valid_scope == cur_scope_name && retired_pc_valid_name == hier->u.var.name){
                     cout << "PC_VALID MATCH!!!" << endl;
                     retired_pc_valid_handle   = hier->u.var.handle;
                 }

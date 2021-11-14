@@ -10,6 +10,18 @@
 
 using namespace std;
 
+class FstSignal
+{
+public:
+    FstSignal() : hasHandle(false) {}
+    FstSignal(string scopeName, string name) : scopeName(scopeName), name(name), hasHandle(false) {}
+
+    string      scopeName;
+    string      name;
+    bool        hasHandle;
+    fstHandle   handle;
+};
+
 class FstProcess
 {
 public:
@@ -34,18 +46,20 @@ public:
 
     string infoStr(void);
 
+    bool assignHandles(vector<FstSignal> &signals);
+
 //private:
     string  fstFileName;
     void *  fstCtx;
     
 public:
-    vector<string> fileTypeStrings = {
+    const vector<string> fileTypeStrings = {
         "VERILOG",
         "VHDL",
         "VERILOG_VHDL"
     };
 
-    vector<string> scopeTypeStrings = {
+    const vector<string> scopeTypeStrings = {
         "VCD_MODULE",
         "VCD_TASK",
         "VCD_FUNCTION",
@@ -71,7 +85,7 @@ public:
         "VHDL_PACKAGE"
     };
     
-    vector<string> varTypeStrings = {
+    const vector<string> varTypeStrings = {
         "VCD_EVENT",
         "VCD_INTEGER",
         "VCD_PARAMETER",
@@ -106,7 +120,7 @@ public:
         "SV_SHORTREAL"
     };
     
-    vector<string> varDirStrings = {
+    const vector<string> varDirStrings = {
         "IMPLICIT",
         "INPUT",
         "OUTPUT",
@@ -115,7 +129,7 @@ public:
         "LINKAGE"
     };
     
-    vector<string> hierTypeStrings = {
+    const vector<string> hierTypeStrings = {
         "SCOPE",
         "UPSCOPE",
         "VAR",

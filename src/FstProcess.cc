@@ -66,24 +66,50 @@ string FstProcess::infoStr(void)
     return ss.str();
 }
 
-/*
+// For a given list of signals, look for and assign the fstHandle
+// Return true if all signals are found. 
+bool FstProcess::assignHandles(vector<FstSignal> &signals)
+{
+    struct fstHier *hier;
+    string curScopeName; 
 
-    uint64_t        aliasCount                      = fstReaderGetAliasCount(fstCtx);
-    const char *    curFlatScope                    = fstReaderGetCurrentFlatScope(fstCtx);
-    int             curScopeLen                     = fstReaderGetCurrentScopeLen(fstCtx);
-    int             doubleEndianMatchState          = fstReaderGetDoubleEndianMatchState(fstCtx);
-    uint64_t        dumpActivityChangeTime          = fstReaderGetDumpActivityChangeTime(fstCtx, 0);
-    unsigned char   dumpActivityChangeValue         = fstReaderGetDumpActivityChangeValue(fstCtx, 0);
-    uint64_t        startTime                       = fstReaderGetStartTime(fstCtx);
-    uint64_t        endTime                         = fstReaderGetEndTime(fstCtx);
-    int64_t         timezero                        = fstReaderGetTimezero(fstCtx);
-    int             fileType                        = fstReaderGetFileType(fstCtx);
-    int             fseekFailed                     = fstReaderGetFseekFailed(fstCtx);
-    uint64_t        memoryUsedByWriter              = fstReaderGetMemoryUsedByWriter(fstCtx);
-    uint32_t        numDumpActivityChanges          = fstReaderGetNumberDumpActivityChanges(fstCtx);
-    uint64_t        scopeCount                      = fstReaderGetScopeCount(fstCtx);
-    signed char     timescale                       = fstReaderGetTimescale(fstCtx);
-    uint64_t        valueChangeSectionCount         = fstReaderGetValueChangeSectionCount(fstCtx);
-    uint64_t        varCount                        = fstReaderGetVarCount(fstCtx);
+    bool sigNotFound;
 
-*/
+    while((hier = fstReaderIterateHier(fstCtx))){
+
+        switch(hier->htyp){
+            case FST_HT_SCOPE: {
+                curScopeName = fstReaderPushScope(fstCtx, hier->u.scope.name, NULL);
+                //cout << "curScopeName: " << curScopeName << endl;
+                break;
+            }
+
+            case FST_HT_UPSCOPE: {
+                curScopeName = fstReaderPopScope(fstCtx);
+                //cout << "curScopeName: " << curScopeName << endl;
+                break;
+            }
+
+            case FST_HT_VAR: {
+                string curName = hier->u.var.name;
+                //cout << "curName: " << curName << endl;
+
+                sigNotFound = false;
+                for(auto & sig: signals){
+                    if (sig.hasHandle)
+                        continue;
+                    sigNotFound     = true;
+
+                    if (sig.scopeName == curScopeName && sig.name == curName){
+                        sig.hasHandle   = true;
+                        sig.handle      = hier->u.var.handle;
+                    }
+                }
+                break;
+            }
+        }
+
+    }
+
+    return !sigNotFound;
+}

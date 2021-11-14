@@ -1,13 +1,13 @@
 
 
-INC_FILES   = FstProcess.h
-OBJ_FILES   = main.o FstProcess.o
+INC_FILES   = FstProcess.h CpuTrace.h
+OBJ_FILES   = main.o FstProcess.o CpuTrace.o
 LIB_FILES   = -lfstapi -lz
 
-CXXFLAGS    += --std=c++14 -I. -L./fst
+CXXFLAGS    += --std=c++14 -I. -L./fst -Wall -g -O0
 
 all: gdbwave
-	./gdbwave | head -30
+	./gdbwave 
 
 run: gdbwave
 	./gdbwave
