@@ -15,6 +15,11 @@ FstProcess::FstProcess(string fstFileName) :
     }
 }
 
+FstProcess::~FstProcess()
+{
+    fstReaderClose(fstCtx);
+}
+
 string FstProcess::infoStr(void)
 {
     stringstream ss;

@@ -22,3 +22,4 @@ $(OBJ_FILES): $(INC_FILES)
 
 clean:
 	\rm -fr gdbwave *.o
+	cd fst && make clean

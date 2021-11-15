@@ -24,6 +24,9 @@ public:
     FstSignal       pcValid;
     FstSignal       pc;
 
+    uint64_t        curPcValidVal;
+    uint64_t        curPcVal;
+
     vector<PcValue>     pcTrace;
 };
 

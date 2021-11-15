@@ -1,5 +1,5 @@
 
-CFLAGS      += -I.
+CFLAGS      += -I. -g
 OBJ_FILES   = fastlz.o lz4.o fstapi.o
 AR_FILE     = libfstapi.a
 

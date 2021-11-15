@@ -26,6 +26,7 @@ class FstProcess
 {
 public:
     FstProcess(string fstFileName);
+    ~FstProcess();
 
     string      version(void)       { return fstReaderGetVersionString(fstCtx); };
     string      date(void)          { 
