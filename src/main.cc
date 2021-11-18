@@ -5,6 +5,7 @@
 
 #include "CpuTrace.h"
 #include "FstProcess.h"
+#include "TcpServer.h"
 
 using namespace std;
 
@@ -59,6 +60,8 @@ int main(int argc, char **argv)
     FstSignal retired_pc_valid_sig(retired_pc_valid_scope, retired_pc_valid_name);
 
     CpuTrace    cpuTrace(fstProc, clk_sig, retired_pc_valid_sig, retired_pc_sig);
+
+    TcpServer(3333);
 
 #if 0
     void *fstCtx;

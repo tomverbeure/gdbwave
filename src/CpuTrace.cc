@@ -35,7 +35,7 @@ static void pcChangedCB(uint64_t time, FstSignal *signal, const unsigned char *v
     // All signals changes on the rising edge of the clock. Everything is stable at the falling edge...
     if (signal->handle == cpuTrace->clk.handle && valueInt == 0){
         if (cpuTrace->curPcValidVal){
-            cout << "instr retire: " << time << "," << std::hex << cpuTrace->curPcVal << endl;
+            cout << "instr retire: " << time << "," << std::hex << cpuTrace->curPcVal << std::dec << endl;
 
             PcValue     pc = { time, cpuTrace->curPcVal };
             cpuTrace->pcTrace.push_back(pc);

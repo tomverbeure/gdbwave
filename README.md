@@ -105,3 +105,23 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
     I never see a callback with a len that is not 0?
 
 
+* Probing VexRiscv PC:
+
+    > Here is how the verilator testbench track the commited state of the CPU :
+    > https://github.com/SpinalHDL/VexRiscv/blob/master/src/test/cpp/regression/main.cpp#L1778
+    > https://github.com/SpinalHDL/VexRiscv/blob/master/src/test/cpp/regression/main.cpp#L1793
+    > https://github.com/SpinalHDL/VexRiscv/blob/master/src/test/cpp/regression/main.cpp#L1803
+    > lastStagexxxxx is the way ^^
+    > It was made for that purpose
+
+* Hazard3 OpenOCD remote_bitbang server
+
+    https://github.com/Wren6991/Hazard3/blob/c1f17b0b23d7e1a52241663bfb53568c89440f2d/test/sim/openocd/tb.cpp#L91g
+
+* GDB packets: https://sourceware.org/gdb/current/onlinedocs/gdb/Packets.html#Packets
+
+* RISC-V GDB register description: 
+
+    * https://github.com/bminor/binutils-gdb/blob/master/gdb/features/riscv/32bit-cpu.xml
+    * (derived) https://github.com/bminor/binutils-gdb/blob/master/gdb/features/riscv/32bit-cpu.c
+
