@@ -61,7 +61,18 @@ int main(int argc, char **argv)
 
     CpuTrace    cpuTrace(fstProc, clk_sig, retired_pc_valid_sig, retired_pc_sig);
 
-    TcpServer(3333);
+    TcpServer tcpServer(3333);
+
+    unsigned char rxbuf[256];
+    int ret;
+
+    while( (ret = tcpServer.recv(rxbuf, 256)) >= 0){
+        if (ret > 0){
+            cout << rxbuf << endl;
+            tcpServer.xmit("hhh", 3);
+            tcpServer.xmit(rxbuf, ret);
+        }
+    }
 
 #if 0
     void *fstCtx;

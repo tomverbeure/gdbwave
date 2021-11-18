@@ -62,3 +62,21 @@ void TcpServer::open(int port)
 
     cout << "Connected!" << endl;
 }
+
+size_t TcpServer::xmit(const void *buf, size_t len)
+{
+    // FIXME: how to do error handling?
+    int ret = send(socket_fd, buf, len, 0);
+
+    return ret;
+}
+
+size_t TcpServer::recv(void *buf, size_t buf_size)
+{
+    int ret = read(socket_fd, buf, buf_size);
+
+    return ret;
+}
+
+
+
