@@ -5,6 +5,7 @@
 
 #include "CpuTrace.h"
 #include "FstProcess.h"
+#include "TcpServer.h"
 
 using namespace std;
 
@@ -59,6 +60,19 @@ int main(int argc, char **argv)
     FstSignal retired_pc_valid_sig(retired_pc_valid_scope, retired_pc_valid_name);
 
     CpuTrace    cpuTrace(fstProc, clk_sig, retired_pc_valid_sig, retired_pc_sig);
+
+    TcpServer tcpServer(3333);
+
+    unsigned char rxbuf[256];
+    int ret;
+
+    while( (ret = tcpServer.recv(rxbuf, 256)) >= 0){
+        if (ret > 0){
+            cout << rxbuf << endl;
+            tcpServer.xmit("hhh", 3);
+            tcpServer.xmit(rxbuf, ret);
+        }
+    }
 
 #if 0
     void *fstCtx;

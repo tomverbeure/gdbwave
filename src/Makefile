@@ -1,7 +1,7 @@
 
 
 INC_FILES   = FstProcess.h CpuTrace.h
-OBJ_FILES   = main.o FstProcess.o CpuTrace.o gdbstub.o gdbstub_sys.o
+OBJ_FILES   = main.o FstProcess.o CpuTrace.o TcpServer.o gdbstub.o gdbstub_sys.o
 LIB_FILES   = -lfstapi -lz
 
 CXXFLAGS    += --std=c++14 -I. -Wall -g -O0
