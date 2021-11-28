@@ -66,12 +66,19 @@ int main(int argc, char **argv)
     unsigned char rxbuf[256];
     int ret;
 
-    while( (ret = tcpServer.recv(rxbuf, 256)) >= 0){
+    while( (ret = tcpServer.recv(rxbuf, 256)) > 0){
+        cout << "ret:" <<  ret << endl;
         if (ret > 0){
-            cout << rxbuf << endl;
             tcpServer.xmit("hhh", 3);
             tcpServer.xmit(rxbuf, ret);
         }
+    }
+
+    if (ret == 0){
+        cout << "Connection closed..." << endl;
+    }
+    else{
+        cout << "Connection error: " << ret << endl;
     }
 
 #if 0
