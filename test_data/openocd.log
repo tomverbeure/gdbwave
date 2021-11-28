@@ -1,0 +1,383 @@
+Debug: 6 2 log.c:252 handle_log_output_command(): set log_output to "openocd.log"
+Debug: 7 2 options.c:244 add_default_dirs(): bindir=/opt/openocd_vex/bin
+Debug: 8 2 options.c:245 add_default_dirs(): pkgdatadir=/opt/openocd_vex/share/openocd
+Debug: 9 2 options.c:246 add_default_dirs(): exepath=/opt/openocd_vex/bin
+Debug: 10 2 options.c:247 add_default_dirs(): bin2data=../share/openocd
+Debug: 11 2 configuration.c:44 add_script_search_dir(): adding /home/tom/.config/openocd
+Debug: 12 2 configuration.c:44 add_script_search_dir(): adding /home/tom/.openocd
+Debug: 13 2 configuration.c:44 add_script_search_dir(): adding /opt/openocd_vex/bin/../share/openocd/site
+Debug: 14 2 configuration.c:44 add_script_search_dir(): adding /opt/openocd_vex/bin/../share/openocd/scripts
+Debug: 15 2 command.c:201 script_debug(): command - adapter driver jtag_tcp
+Info : 16 2 transport.c:118 allow_transports(): only one transport option; autoselect 'jtag'
+Debug: 17 2 command.c:201 script_debug(): command - adapter speed 1000
+Debug: 18 2 core.c:1816 jtag_config_khz(): handle jtag khz
+Debug: 19 2 core.c:1779 adapter_khz_to_speed(): convert khz to interface specific speed value
+Debug: 20 2 core.c:1779 adapter_khz_to_speed(): convert khz to interface specific speed value
+Debug: 21 2 command.c:201 script_debug(): command - transport select jtag
+Warn : 22 2 transport.c:287 jim_transport_select(): Transport "jtag" was already selected
+User : 23 2 options.c:63 configuration_output_handler(): jtagUser : 24 2 options.c:63 configuration_output_handler(): 
+Debug: 25 2 command.c:201 script_debug(): command - ocd_find vexriscv_init.cfg
+Debug: 26 2 configuration.c:99 find_file(): found vexriscv_init.cfg
+Debug: 27 2 command.c:201 script_debug(): command - jtag newtap vexrisc_ocd bridge -expected-id 0x10001fff -irlen 4 -ircapture 0x1 -irmask 0xF
+Debug: 28 2 tcl.c:565 jim_newtap_cmd(): Creating New Tap, Chip: vexrisc_ocd, Tap: bridge, Dotted: vexrisc_ocd.bridge, 8 params
+Debug: 29 2 tcl.c:590 jim_newtap_cmd(): Processing option: -expected-id
+Debug: 30 2 tcl.c:590 jim_newtap_cmd(): Processing option: -irlen
+Debug: 31 2 tcl.c:590 jim_newtap_cmd(): Processing option: -ircapture
+Debug: 32 2 tcl.c:590 jim_newtap_cmd(): Processing option: -irmask
+Debug: 33 2 core.c:1478 jtag_tap_init(): Created Tap: vexrisc_ocd.bridge @ abs position 0, irlen 4, capture: 0x1 mask: 0xf
+Debug: 34 2 command.c:201 script_debug(): command - target create vexrisc_ocd.cpu0 vexriscv -endian little -chain-position vexrisc_ocd.bridge
+Debug: 35 2 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 36 2 vexriscv.c:203 vexriscv_target_create(): vexriscv_target_create
+
+Debug: 37 2 command.c:201 script_debug(): command - vexriscv readWaitCycles 10
+Debug: 38 2 command.c:201 script_debug(): command - vexriscv cpuConfigFile ../spinal/VexRiscvWithDebug.yaml
+Debug: 39 2 command.c:201 script_debug(): command - poll_period 50
+Info : 40 2 server.c:780 handle_poll_period_command(): set servers polling period to 50ms
+Debug: 41 2 command.c:201 script_debug(): command - init
+Debug: 42 2 command.c:201 script_debug(): command - target init
+Debug: 43 2 command.c:201 script_debug(): command - target names
+Debug: 44 2 command.c:201 script_debug(): command - vexrisc_ocd.cpu0 cget -event gdb-flash-erase-start
+Debug: 45 2 command.c:201 script_debug(): command - vexrisc_ocd.cpu0 configure -event gdb-flash-erase-start reset init
+Debug: 46 2 command.c:201 script_debug(): command - vexrisc_ocd.cpu0 cget -event gdb-flash-write-end
+Debug: 47 2 command.c:201 script_debug(): command - vexrisc_ocd.cpu0 configure -event gdb-flash-write-end reset halt
+Debug: 48 2 command.c:201 script_debug(): command - vexrisc_ocd.cpu0 cget -event gdb-attach
+Debug: 49 2 command.c:201 script_debug(): command - vexrisc_ocd.cpu0 configure -event gdb-attach halt 1000
+Debug: 50 2 target.c:1650 handle_target_init_command(): Initializing targets...
+Debug: 51 2 vexriscv.c:566 vexriscv_init_target(): vexriscv_init_target
+
+Debug: 52 2 vexriscv.c:567 vexriscv_init_target(): vexriscv_init_target
+Debug: 53 2 vexriscv.c:362 vexriscv_build_reg_cache(): -
+Debug: 54 2 semihosting_common.c:99 semihosting_common_init():  
+Debug: 55 3 core.c:1779 adapter_khz_to_speed(): convert khz to interface specific speed value
+Debug: 56 3 core.c:1783 adapter_khz_to_speed(): have interface set up
+Debug: 57 3 core.c:1779 adapter_khz_to_speed(): convert khz to interface specific speed value
+Debug: 58 3 core.c:1783 adapter_khz_to_speed(): have interface set up
+Info : 59 3 core.c:1559 adapter_init(): clock speed 1000 kHz
+Debug: 60 3 openocd.c:143 handle_init_command(): Debug Adapter init complete
+Debug: 61 3 command.c:201 script_debug(): command - transport init
+Debug: 62 3 transport.c:230 handle_transport_init(): handle_transport_init
+Debug: 63 98 core.c:833 jtag_add_reset(): SRST line released
+Debug: 64 98 core.c:858 jtag_add_reset(): TRST line released
+Debug: 65 98 core.c:331 jtag_call_event_callbacks(): jtag event: TAP reset
+Debug: 66 98 command.c:201 script_debug(): command - jtag arp_init
+Debug: 67 98 core.c:1572 jtag_init_inner(): Init JTAG chain
+Debug: 68 98 core.c:331 jtag_call_event_callbacks(): jtag event: TAP reset
+Debug: 69 98 core.c:1237 jtag_examine_chain(): DR scan interrogation for IDCODE/BYPASS
+Debug: 70 98 core.c:331 jtag_call_event_callbacks(): jtag event: TAP reset
+Debug: 71 107 jep106.c:33 jep106_table_manufacturer(): BUG: Caller passed out-of-range JEP106 ID!
+Info : 72 107 core.c:1136 jtag_examine_chain_display(): JTAG tap: vexrisc_ocd.bridge tap/device found: 0x10001fff (mfg: 0x7ff (<invalid>), part: 0x0001, ver: 0x1)
+Debug: 73 107 core.c:1368 jtag_validate_ircapture(): IR capture validation scan
+Debug: 74 107 core.c:1425 jtag_validate_ircapture(): vexrisc_ocd.bridge: IR capture 0x01
+Debug: 75 107 command.c:201 script_debug(): command - dap init
+Debug: 76 107 arm_dap.c:107 dap_init_all(): Initializing all DAPs ...
+Debug: 77 107 openocd.c:160 handle_init_command(): Examining targets...
+Debug: 78 107 target.c:1836 target_call_event_callbacks(): target event 19 (examine-start) for core vexrisc_ocd.cpu0
+Debug: 79 107 vexriscv.c:1740 vexriscv_examine(): vexriscv_examine
+Debug: 80 109 target.c:1836 target_call_event_callbacks(): target event 21 (examine-end) for core vexrisc_ocd.cpu0
+Debug: 81 109 command.c:201 script_debug(): command - flash init
+Debug: 82 111 tcl.c:1387 handle_flash_init_command(): Initializing flash devices...
+Debug: 83 111 command.c:201 script_debug(): command - nand init
+Debug: 84 112 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 85 112 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 86 309 target.c:1836 target_call_event_callbacks(): target event 0 (gdb-halt) for core vexrisc_ocd.cpu0
+Debug: 87 309 target.c:1836 target_call_event_callbacks(): target event 1 (halted) for core vexrisc_ocd.cpu0
+Debug: 88 309 tcl.c:498 handle_nand_init_command(): Initializing NAND devices...
+Debug: 89 309 command.c:201 script_debug(): command - pld init
+Debug: 90 310 pld.c:206 handle_pld_init_command(): Initializing PLDs...
+Debug: 91 310 command.c:201 script_debug(): command - tpiu init
+Info : 92 311 gdb_server.c:3537 gdb_target_start(): starting gdb server for vexrisc_ocd.cpu0 on 3333
+Info : 93 311 server.c:311 add_service(): Listening on port 3333 for gdb connections
+Debug: 94 311 command.c:201 script_debug(): command - echo Halting processor
+User : 95 312 command.c:729 jim_echo(): Halting processor
+Debug: 96 312 command.c:201 script_debug(): command - halt
+Debug: 97 313 target.c:3292 handle_halt_command(): -
+Debug: 98 313 vexriscv.c:776 vexriscv_halt(): target->state: halted
+Debug: 99 314 command.c:201 script_debug(): command - sleep 1000
+Debug: 102 1394 command.c:201 script_debug(): command - arm semihosting enable
+Debug: 103 1395 vexriscv.c:1448 vexriscv_semihosting_setup(): enable=1
+User : 104 1395 options.c:63 configuration_output_handler(): semihosting is enabled
+User : 105 1395 options.c:63 configuration_output_handler(): 
+Info : 106 1395 server.c:311 add_service(): Listening on port 6666 for tcl connections
+Info : 107 1395 server.c:311 add_service(): Listening on port 4444 for telnet connections
+Debug: 108 1395 command.c:201 script_debug(): command - init
+Info : 109 20196 server.c:101 add_connection(): accepting 'gdb' connection on tcp/3333
+Debug: 110 20196 breakpoints.c:380 breakpoint_clear_target_internal(): Delete all breakpoints for target: vexrisc_ocd.cpu0
+Debug: 111 20196 breakpoints.c:568 watchpoint_clear_target(): Delete all watchpoints for target: vexrisc_ocd.cpu0
+Debug: 112 20196 target.c:1836 target_call_event_callbacks(): target event 22 (gdb-attach) for core vexrisc_ocd.cpu0
+Debug: 113 20196 target.c:4811 target_handle_event(): target(0): vexrisc_ocd.cpu0 (vexriscv) event: 22 (gdb-attach) action: halt 1000
+Debug: 114 20196 command.c:201 script_debug(): command - halt 1000
+Debug: 115 20197 target.c:3292 handle_halt_command(): -
+Debug: 116 20198 vexriscv.c:776 vexriscv_halt(): target->state: halted
+Debug: 117 20199 gdb_server.c:1047 gdb_new_connection(): New GDB Connection: 1, Target vexrisc_ocd.cpu0, state: halted
+Debug: 118 20199 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qSupported:multiprocess+;swbreak+;hwbreak+;qRelocInsn+;fork-events+;vfork-events+;exec-events+;vContSupported+;QThreadEvents+;no-resumed+
+Debug: 119 20199 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 120 20199 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $PacketSize=4000;qXfer:memory-map:read-;qXfer:features:read+;qXfer:threads:read+;QStartNoAckMode+;vContSupported+#04'
+Debug: 121 20200 gdb_server.c:384 gdb_log_incoming_packet(): received packet: vMustReplyEmpty
+Debug: 122 20200 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $#00'
+Debug: 123 20200 gdb_server.c:384 gdb_log_incoming_packet(): received packet: QStartNoAckMode
+Debug: 124 20200 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 125 20201 gdb_server.c:676 gdb_get_packet_inner(): Received first acknowledgment after entering noack mode. Ignoring it.
+Debug: 126 20201 gdb_server.c:384 gdb_log_incoming_packet(): received packet: !
+Debug: 127 20201 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 128 20202 gdb_server.c:384 gdb_log_incoming_packet(): received packet: Hg0
+Debug: 129 20202 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 130 20203 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qXfer:features:read:target.xml:0,1000
+Debug: 131 20203 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 132 20203 gdb_server.c:394 gdb_log_outgoing_packet(): sending packet: $<binary-data-4097-bytes>#4c
+Debug: 133 20204 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qXfer:features:read:target.xml:1000,1000
+Debug: 134 20204 gdb_server.c:394 gdb_log_outgoing_packet(): sending packet: $<binary-data-2240-bytes>#bc
+Debug: 135 20205 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qTStatus
+Debug: 136 20205 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $#00'
+Debug: 137 20206 gdb_server.c:384 gdb_log_incoming_packet(): received packet: ?
+Debug: 138 20206 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $S02#b5'
+Debug: 139 20208 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qXfer:threads:read::0,1000
+Debug: 140 20208 gdb_server.c:394 gdb_log_outgoing_packet(): sending packet: $<binary-data-44-bytes>#02
+Debug: 141 20209 gdb_server.c:384 gdb_log_incoming_packet(): received packet: Hc-1
+Debug: 142 20209 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 143 20210 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qC
+Debug: 144 20210 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $QC0#c4'
+Debug: 145 20211 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qAttached
+Debug: 146 20211 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $1#31'
+Debug: 147 20212 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qOffsets
+Debug: 148 20212 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $Text=0;Data=0;Bss=0#04'
+Debug: 149 20213 gdb_server.c:384 gdb_log_incoming_packet(): received packet: g
+Debug: 150 20213 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 1
+
+Debug: 151 20213 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $000000001c030000200f0000c777eedca99aa891c803000000000000791eae5e070000000000008004000000300f0000070000007f00000000000000600e00000a000000000000000010000000100000040000000200000001000000a3a2cb850b83af195c5c6fb4bd46ac56bd4e9af0bce89b6e274311fa2e5a6edfae12f0ec#69'
+Debug: 152 20214 gdb_server.c:384 gdb_log_incoming_packet(): received packet: p20
+Debug: 153 20214 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 154 20214 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $74020000#8d'
+Debug: 155 20215 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qXfer:threads:read::0,1000
+Debug: 156 20215 gdb_server.c:394 gdb_log_outgoing_packet(): sending packet: $<binary-data-44-bytes>#02
+Debug: 157 20216 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qSymbol::
+Debug: 158 20216 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 159 30743 gdb_server.c:384 gdb_log_incoming_packet(): received packet: X0,0:
+Debug: 160 30743 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 161 30812 gdb_server.c:378 gdb_log_incoming_packet(): received packet: X0,bfa:<binary-data-2-bytes>
+Debug: 162 30812 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 163 30812 gdb_server.c:1643 gdb_write_memory_binary_packet(): addr: 0x0, len: 0x00000bfa
+Debug: 164 30812 target.c:2401 target_write_buffer(): writing buffer of 3066 byte at 0x00000000
+Debug: 165 30812 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0x0; size 4; count 766
+Debug: 166 30812 vexriscv.c:1343 vexriscv_write_memory(): SAVED : 109
+
+Debug: 167 33401 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0xbf8; size 2; count 1
+Debug: 168 33403 gdb_server.c:378 gdb_log_incoming_packet(): received packet: Xbfc,78:<binary-data-13-bytes>
+Debug: 169 33403 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Warn : 170 33403 log.c:418 gdb_timeout_warning(): keep_alive() was not invoked in the 1000 ms timelimit. GDB alive packet not sent! (2591 ms). Workaround: increase "set remotetimeout" in GDB
+Debug: 171 33403 gdb_server.c:1643 gdb_write_memory_binary_packet(): addr: 0xbfc, len: 0x00000078
+Debug: 172 33403 target.c:2401 target_write_buffer(): writing buffer of 120 byte at 0x00000bfc
+Debug: 173 33403 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0xbfc; size 4; count 30
+Debug: 174 33403 vexriscv.c:1343 vexriscv_write_memory(): SAVED : 2b
+
+Debug: 175 33426 gdb_server.c:384 gdb_log_incoming_packet(): received packet: P20=00000000
+Debug: 176 33426 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 177 33426 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 178 36292 gdb_server.c:384 gdb_log_incoming_packet(): received packet: md6,2
+Debug: 179 36292 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x00000000000000d6, len: 0x00000002
+Debug: 180 36292 target.c:2466 target_read_buffer(): reading buffer of 2 byte at 0x000000d6
+Debug: 181 36293 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $0111#c3'
+Debug: 182 37419 gdb_server.c:384 gdb_log_incoming_packet(): received packet: Z0,d6,2
+Debug: 183 37419 gdb_server.c:1707 gdb_breakpoint_watchpoint_packet(): [vexrisc_ocd.cpu0]
+Debug: 184 37419 vexriscv.c:1506 vexriscv_add_breakpoint(): Adding breakpoint: addr 0x000000d6, len 2, type 1, set: 0, id: 0
+Debug: 185 37423 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0xd6; size 2; count 1
+Debug: 186 37425 breakpoints.c:98 breakpoint_add_internal(): [0] added software breakpoint at 0x000000d6 of length 0x00000002, (BPID: 0)
+Debug: 187 37425 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 188 37426 gdb_server.c:384 gdb_log_incoming_packet(): received packet: vCont?
+Debug: 189 37426 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $vCont;c;C;s;S#62'
+Debug: 190 37427 gdb_server.c:384 gdb_log_incoming_packet(): received packet: vCont;c
+Debug: 191 37427 gdb_server.c:2789 gdb_handle_vcont_packet(): target vexrisc_ocd.cpu0 continue
+Debug: 192 37427 target.c:1836 target_call_event_callbacks(): target event 3 (resume-start) for core vexrisc_ocd.cpu0
+Debug: 193 37427 vexriscv.c:1651 vexriscv_resume_or_step(): Addr: 0x0, stepping: no, handle breakpoints no
+
+Debug: 194 37427 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 195 37427 vexriscv.c:732 vexriscv_restore_context(): -
+Debug: 196 37431 target.c:1836 target_call_event_callbacks(): target event 2 (resumed) for core vexrisc_ocd.cpu0
+Debug: 197 37431 vexriscv.c:1709 vexriscv_resume_or_step(): Target resumed at 0x00000000
+Debug: 198 37431 target.c:1836 target_call_event_callbacks(): target event 4 (resume-end) for core vexrisc_ocd.cpu0
+Debug: 199 37431 target.c:1836 target_call_event_callbacks(): target event 7 (gdb-start) for core vexrisc_ocd.cpu0
+Debug: 200 37432 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 201 37536 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 202 37582 vexriscv.c:834 vexriscv_semihosting(): semihosting pc: 000000d6
+Debug: 203 37594 vexriscv.c:857 vexriscv_semihosting(): semihosting check 10c30067 ce069002 ca26cc22 from 0xd6-4
+Debug: 204 37594 target.c:1836 target_call_event_callbacks(): target event 0 (gdb-halt) for core vexrisc_ocd.cpu0
+Debug: 205 37594 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $T00#b4'
+Debug: 206 37594 target.c:1836 target_call_event_callbacks(): target event 1 (halted) for core vexrisc_ocd.cpu0
+Debug: 207 37594 target.c:1836 target_call_event_callbacks(): target event 8 (gdb-end) for core vexrisc_ocd.cpu0
+Debug: 208 37595 gdb_server.c:384 gdb_log_incoming_packet(): received packet: p20
+Debug: 209 37595 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 210 37595 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $d6000000#ba'
+Debug: 211 37702 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qXfer:threads:read::0,1000
+Debug: 212 37702 gdb_server.c:394 gdb_log_outgoing_packet(): sending packet: $<binary-data-44-bytes>#02
+Debug: 213 37703 gdb_server.c:384 gdb_log_incoming_packet(): received packet: z0,d6,2
+Debug: 214 37703 gdb_server.c:1707 gdb_breakpoint_watchpoint_packet(): [vexrisc_ocd.cpu0]
+Debug: 215 37703 vexriscv.c:1586 vexriscv_remove_breakpoint(): Removing breakpoint: addr 0x000000d6, len 2, type 1, set: 0, id: 0
+Debug: 216 37703 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0xd6; size 2; count 1
+Debug: 217 37705 breakpoints.c:305 breakpoint_free(): free BPID: 0 --> 0
+Debug: 218 37705 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 219 37706 gdb_server.c:384 gdb_log_incoming_packet(): received packet: g
+Debug: 220 37706 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 1
+
+Debug: 221 37706 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $00000000b400000000100000c777eedca99aa891c803000000000000791eae5e070000000000008004000000300f0000070000007f00000000000000600e00000a000000000000000010000000100000040000000200000001000000a3a2cb850b83af195c5c6fb4bd46ac56bd4e9af0bce89b6e274311fa2e5a6edfae12f0ec#31'
+Debug: 222 46306 gdb_server.c:384 gdb_log_incoming_packet(): received packet: vCont;s:0;c:0
+Debug: 223 46306 gdb_server.c:2870 gdb_handle_vcont_packet(): request to step current core only
+Debug: 224 46306 gdb_server.c:2878 gdb_handle_vcont_packet(): target vexrisc_ocd.cpu0 single-step thread 0
+Debug: 225 46306 target.c:1836 target_call_event_callbacks(): target event 7 (gdb-start) for core vexrisc_ocd.cpu0
+Debug: 226 46306 target.c:1836 target_call_event_callbacks(): target event 5 (step-start) for core vexrisc_ocd.cpu0
+Debug: 227 46306 vexriscv.c:1651 vexriscv_resume_or_step(): Addr: 0x0, stepping: yes, handle breakpoints no
+
+Debug: 228 46306 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 229 46306 vexriscv.c:732 vexriscv_restore_context(): -
+Debug: 230 46309 target.c:1836 target_call_event_callbacks(): target event 2 (resumed) for core vexrisc_ocd.cpu0
+Debug: 231 46309 vexriscv.c:1709 vexriscv_resume_or_step(): Target resumed at 0x000000d6
+Debug: 232 46309 target.c:1836 target_call_event_callbacks(): target event 6 (step-end) for core vexrisc_ocd.cpu0
+Debug: 233 46310 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 234 46310 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 235 46357 vexriscv.c:834 vexriscv_semihosting(): semihosting pc: 000000d8
+Debug: 236 46468 vexriscv.c:857 vexriscv_semihosting(): semihosting check 110110c3 cc22ce06 c84aca26 from 0xd8-4
+Debug: 237 46468 target.c:1836 target_call_event_callbacks(): target event 0 (gdb-halt) for core vexrisc_ocd.cpu0
+Debug: 238 46468 target.c:1836 target_call_event_callbacks(): target event 1 (halted) for core vexrisc_ocd.cpu0
+Debug: 239 46468 target.c:1836 target_call_event_callbacks(): target event 8 (gdb-end) for core vexrisc_ocd.cpu0
+Debug: 240 46468 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $T05#b9'
+Debug: 241 46469 gdb_server.c:384 gdb_log_incoming_packet(): received packet: p20
+Debug: 242 46469 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 243 46469 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $d8000000#bc'
+Debug: 244 46470 gdb_server.c:384 gdb_log_incoming_packet(): received packet: Z0,d6,2
+Debug: 245 46470 gdb_server.c:1707 gdb_breakpoint_watchpoint_packet(): [vexrisc_ocd.cpu0]
+Debug: 246 46470 vexriscv.c:1506 vexriscv_add_breakpoint(): Adding breakpoint: addr 0x000000d6, len 2, type 1, set: 0, id: 1
+Debug: 247 46474 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0xd6; size 2; count 1
+Debug: 248 46476 breakpoints.c:98 breakpoint_add_internal(): [0] added software breakpoint at 0x000000d6 of length 0x00000002, (BPID: 1)
+Debug: 249 46476 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 250 46477 gdb_server.c:384 gdb_log_incoming_packet(): received packet: vCont;c
+Debug: 251 46477 gdb_server.c:2789 gdb_handle_vcont_packet(): target vexrisc_ocd.cpu0 continue
+Debug: 252 46477 target.c:1836 target_call_event_callbacks(): target event 3 (resume-start) for core vexrisc_ocd.cpu0
+Debug: 253 46477 vexriscv.c:1651 vexriscv_resume_or_step(): Addr: 0x0, stepping: no, handle breakpoints no
+
+Debug: 254 46477 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 255 46477 vexriscv.c:732 vexriscv_restore_context(): -
+Debug: 256 46480 target.c:1836 target_call_event_callbacks(): target event 2 (resumed) for core vexrisc_ocd.cpu0
+Debug: 257 46480 vexriscv.c:1709 vexriscv_resume_or_step(): Target resumed at 0x000000d8
+Debug: 258 46480 target.c:1836 target_call_event_callbacks(): target event 4 (resume-end) for core vexrisc_ocd.cpu0
+Debug: 259 46480 target.c:1836 target_call_event_callbacks(): target event 7 (gdb-start) for core vexrisc_ocd.cpu0
+Debug: 260 46622 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 261 46622 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 262 46669 vexriscv.c:834 vexriscv_semihosting(): semihosting pc: 00000274
+Debug: 263 46680 vexriscv.c:857 vexriscv_semihosting(): semihosting check 01f01013 00100073 40705013 from 0x274-4
+Debug: 264 46680 vexriscv.c:881 vexriscv_semihosting(): semihosting  r0: 00000004
+Debug: 265 46680 vexriscv.c:882 vexriscv_semihosting(): semihosting  r1: 00000f30
+Debug: 266 46680 semihosting_common.c:170 semihosting_common(): op=0x4, param=0xf30
+Debug: 267 46814 vexriscv.c:1467 vexriscv_semihosting_post_result(): 0x0
+Debug: 268 46814 target.c:1836 target_call_event_callbacks(): target event 3 (resume-start) for core vexrisc_ocd.cpu0
+Debug: 269 46814 vexriscv.c:1651 vexriscv_resume_or_step(): Addr: 0x278, stepping: no, handle breakpoints no
+
+Debug: 270 46814 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 271 46814 vexriscv.c:732 vexriscv_restore_context(): -
+Debug: 272 46817 target.c:1836 target_call_event_callbacks(): target event 2 (resumed) for core vexrisc_ocd.cpu0
+Debug: 273 46817 vexriscv.c:1709 vexriscv_resume_or_step(): Target resumed at 0x00000278
+Debug: 274 46817 target.c:1836 target_call_event_callbacks(): target event 4 (resume-end) for core vexrisc_ocd.cpu0
+Debug: 275 46818 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 276 46818 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 277 46966 vexriscv.c:834 vexriscv_semihosting(): semihosting pc: 00000294
+Debug: 278 46977 vexriscv.c:857 vexriscv_semihosting(): semihosting check 01f01013 00100073 40705013 from 0x294-4
+Debug: 279 46977 vexriscv.c:881 vexriscv_semihosting(): semihosting  r0: 00000003
+Debug: 280 46977 vexriscv.c:882 vexriscv_semihosting(): semihosting  r1: 00000fdf
+Debug: 281 46977 semihosting_common.c:170 semihosting_common(): op=0x3, param=0xfdf
+Debug: 282 46979 vexriscv.c:1467 vexriscv_semihosting_post_result(): 0x0
+Debug: 283 46979 target.c:1836 target_call_event_callbacks(): target event 3 (resume-start) for core vexrisc_ocd.cpu0
+Debug: 284 46979 vexriscv.c:1651 vexriscv_resume_or_step(): Addr: 0x298, stepping: no, handle breakpoints no
+
+Debug: 285 46979 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 286 46979 vexriscv.c:732 vexriscv_restore_context(): -
+Debug: 287 46982 target.c:1836 target_call_event_callbacks(): target event 2 (resumed) for core vexrisc_ocd.cpu0
+Debug: 288 46982 vexriscv.c:1709 vexriscv_resume_or_step(): Target resumed at 0x00000298
+Debug: 289 46982 target.c:1836 target_call_event_callbacks(): target event 4 (resume-end) for core vexrisc_ocd.cpu0
+Debug: 290 47100 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 291 47101 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 292 47148 vexriscv.c:834 vexriscv_semihosting(): semihosting pc: 000002c4
+Debug: 293 47159 vexriscv.c:857 vexriscv_semihosting(): semihosting check 01f01013 00100073 40705013 from 0x2c4-4
+Debug: 294 47159 vexriscv.c:881 vexriscv_semihosting(): semihosting  r0: 00000007
+Debug: 295 47159 vexriscv.c:882 vexriscv_semihosting(): semihosting  r1: 00000000
+Debug: 296 47159 semihosting_common.c:170 semihosting_common(): op=0x7, param=0x0
+Debug: 297 55567 semihosting_common.c:868 semihosting_common(): getchar()=97
+Debug: 298 55567 vexriscv.c:1467 vexriscv_semihosting_post_result(): 0x61
+Debug: 299 55567 target.c:1836 target_call_event_callbacks(): target event 3 (resume-start) for core vexrisc_ocd.cpu0
+Debug: 300 55567 vexriscv.c:1651 vexriscv_resume_or_step(): Addr: 0x2c8, stepping: no, handle breakpoints no
+
+Debug: 301 55567 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
+Debug: 302 55567 vexriscv.c:732 vexriscv_restore_context(): -
+Debug: 303 55569 target.c:1836 target_call_event_callbacks(): target event 2 (resumed) for core vexrisc_ocd.cpu0
+Debug: 304 55569 vexriscv.c:1709 vexriscv_resume_or_step(): Target resumed at 0x000002c8
+Debug: 305 55569 target.c:1836 target_call_event_callbacks(): target event 4 (resume-end) for core vexrisc_ocd.cpu0
+Warn : 306 55569 log.c:418 gdb_timeout_warning(): keep_alive() was not invoked in the 1000 ms timelimit. GDB alive packet not sent! (8586 ms). Workaround: increase "set remotetimeout" in GDB
+Debug: 307 55569 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $O6b6565705f616c697665282920776173206e6f7420696e766f6b656420696e207468652031303030206d732074696d656c696d69742e2047444220616c697665207061636b6574206e6f742073656e7421202838353836206d73292e20576f726b61726f756e643a20696e63726561736520227365742072656d6f746574696d656f75742220696e204744420a#3e'
+Debug: 308 55569 gdb_server.c:384 gdb_log_incoming_packet(): received packet: 
+Debug: 309 55569 vexriscv.c:776 vexriscv_halt(): target->state: running
+Debug: 310 55571 vexriscv.c:757 vexriscv_debug_entry(): -
+Debug: 311 55572 vexriscv.c:683 vexriscv_save_context(): -
+Debug: 312 55722 target.c:1836 target_call_event_callbacks(): target event 0 (gdb-halt) for core vexrisc_ocd.cpu0
+Debug: 313 55722 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $T02#b6'
+Debug: 314 55722 target.c:1836 target_call_event_callbacks(): target event 1 (halted) for core vexrisc_ocd.cpu0
+Debug: 315 55722 target.c:1836 target_call_event_callbacks(): target event 8 (gdb-end) for core vexrisc_ocd.cpu0
+Debug: 316 55723 gdb_server.c:384 gdb_log_incoming_packet(): received packet: p20
+Debug: 317 55723 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 0
+
+Debug: 318 55725 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $fc070000#f0'
+Debug: 319 55726 gdb_server.c:384 gdb_log_incoming_packet(): received packet: qXfer:threads:read::0,1000
+Debug: 320 55726 gdb_server.c:394 gdb_log_outgoing_packet(): sending packet: $<binary-data-44-bytes>#02
+Debug: 321 55727 gdb_server.c:384 gdb_log_incoming_packet(): received packet: z0,d6,2
+Debug: 322 55727 gdb_server.c:1707 gdb_breakpoint_watchpoint_packet(): [vexrisc_ocd.cpu0]
+Debug: 323 55727 vexriscv.c:1586 vexriscv_remove_breakpoint(): Removing breakpoint: addr 0x000000d6, len 2, type 1, set: 0, id: 1
+Debug: 324 55727 vexriscv.c:1282 vexriscv_write_memory(): Writing memory at physical address 0xd6; size 2; count 1
+Debug: 325 55729 breakpoints.c:305 breakpoint_free(): free BPID: 1 --> 0
+Debug: 326 55729 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 327 55730 gdb_server.c:384 gdb_log_incoming_packet(): received packet: g
+Debug: 328 55730 vexriscv.c:1479 vexriscv_get_gdb_reg_list(): vexriscv_get_gdb_reg_list 1
+
+Debug: 329 55730 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $000000008c0a0000c00e0000c777eedca99aa891c803000000000000791eae5e06000000140c00006400000023000000090000006a000000160000006f0000000a00000000000000560300007f000000300f0000ffff0000180c0000c40f0000000000005c5c6fb4bd46ac5606000000bce89b6e274311fa2e5a6edfae12f0ec#3f'
+Debug: 330 55731 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mf00,40
+Debug: 331 55731 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000f00, len: 0x00000040
+Debug: 332 55731 target.c:2466 target_read_buffer(): reading buffer of 64 byte at 0x00000f00
+Debug: 333 55768 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $0100000002000000040000000010000000100000000000806400000010030000000000000000000000000000c40f0000636861723a20576f726c64210a000000#b1'
+Debug: 334 55769 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mf80,40
+Debug: 335 55769 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000f80, len: 0x00000040
+Debug: 336 55769 target.c:2466 target_read_buffer(): reading buffer of 64 byte at 0x00000f80
+Debug: 337 55910 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $070000007f0000006e000000000000000a000000000000000010000000100000040000000200000001000000a3a2cb850b83af195c5c6fb4640000007c010000#67'
+Debug: 338 55911 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mfc0,40
+Debug: 339 55911 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000fc0, len: 0x00000040
+Debug: 340 55911 target.c:2466 target_read_buffer(): reading buffer of 64 byte at 0x00000fc0
+Debug: 341 56051 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $bce89b6e610000000d0000007f0000006e000000000000000a0000000000000001000000020000000400000000100000001000000000008007000000b4000000#4a'
+Debug: 342 56052 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mf30,8
+Debug: 343 56052 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000f30, len: 0x00000008
+Debug: 344 56052 target.c:2466 target_read_buffer(): reading buffer of 8 byte at 0x00000f30
+Debug: 345 56057 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $636861723a20576f#a5'
+Debug: 346 56058 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mf38,8
+Debug: 347 56058 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000f38, len: 0x00000008
+Debug: 348 56058 target.c:2466 target_read_buffer(): reading buffer of 8 byte at 0x00000f38
+Debug: 349 56063 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $726c64210a000000#80'
+Debug: 350 56064 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mc13,8
+Debug: 351 56064 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000c13, len: 0x00000008
+Debug: 352 56064 target.c:2466 target_read_buffer(): reading buffer of 8 byte at 0x00000c13
+Debug: 353 56074 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $6400000000ec0700#79'
+Debug: 354 56075 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mc0c,8
+Debug: 355 56075 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000c0c, len: 0x00000008
+Debug: 356 56075 target.c:2466 target_read_buffer(): reading buffer of 8 byte at 0x00000c0c
+Debug: 357 56081 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $636861723a202564#6e'
+Debug: 358 56082 gdb_server.c:384 gdb_log_incoming_packet(): received packet: mc14,8
+Debug: 359 56082 gdb_server.c:1495 gdb_read_memory_packet(): addr: 0x0000000000000c14, len: 0x00000008
+Debug: 360 56082 target.c:2466 target_read_buffer(): reading buffer of 8 byte at 0x00000c14
+Debug: 361 56087 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $00000000ec070000#6f'
+Debug: 362 61882 gdb_server.c:384 gdb_log_incoming_packet(): received packet: D
+Debug: 363 61882 gdb_server.c:396 gdb_log_outgoing_packet(): sending packet: $OK#9a'
+Debug: 364 61883 gdb_server.c:1087 gdb_connection_closed(): GDB Close, Target: vexrisc_ocd.cpu0, state: halted, gdb_actual_connections=0
+Debug: 365 61883 target.c:1836 target_call_event_callbacks(): target event 8 (gdb-end) for core vexrisc_ocd.cpu0
+Debug: 366 61883 target.c:1836 target_call_event_callbacks(): target event 23 (gdb-detach) for core vexrisc_ocd.cpu0
+Info : 367 61883 server.c:580 server_loop(): dropped 'gdb' connection
+Debug: 368 64327 server.c:613 sig_handler(): Terminating on Signal 2
+Debug: 369 64334 command.c:201 script_debug(): command - shutdown
+User : 370 64336 server.c:759 handle_shutdown_command(): shutdown command invoked
+Debug: 371 64336 target.c:2194 target_free_all_working_areas_restore(): freeing all working areas
