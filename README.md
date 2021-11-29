@@ -125,3 +125,37 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
     * https://github.com/bminor/binutils-gdb/blob/master/gdb/features/riscv/32bit-cpu.xml
     * (derived) https://github.com/bminor/binutils-gdb/blob/master/gdb/features/riscv/32bit-cpu.c
 
+* [ESP8266 gdbstub](https://github.com/espressif/esp-gdbstub)
+
+
+* gdbstub
+
+```
+    demo.c:_start
+        demo.c:dbg_start()
+            arch_x86/gdbstub_sys: dbg_start(void)
+                - setup interrupt handlers to dbg_int_handlers(1 and 3)
+                - issue interrupt to start debugging
+            arch_x86/gdbstub_int.nasm:dbg_int_handlers:
+                -> dbg_int_handler_common:
+                    - save registers
+                    - call dbg_int_handler()
+
+                    arch_x86/gdbstub_sys.c: void dbg_int_handler(struct dbg_interrupt_state *istate)
+                        arch_x86/gdbstub_sys.c: void dbg_inerrupt(struct dbg_interrupt_state *istate)
+                            - memset dbg_state.registers
+                            - set correct signum
+                            - copy istate to dbg_state.registers
+                            - dbg_main(dbg_state)
+                            gdbstub.cc: int dbg_main(struct dbg_state *state)
+                                dbg_send_signal_packet(pkt_buf.., state->signum)
+                                    This sends a "S AA" response (See E.3 Stop Reply Packets), where AA is the
+                                    signum.
+                                wihle(1){
+                                    receive packet from client
+                                    process packet
+                                }
+                            - restore istate from dbg_state.registers
+
+
+```
