@@ -23,11 +23,16 @@
 #ifndef _GDBSTUB_SYS_H_
 #define _GDBSTUB_SYS_H_
 
+#include <cstddef>
+#include <stdint.h>
+
+#include "TcpServer.h"
+
 /* Define the size_t type */
-#define DBG_DEFINE_SIZET 1
+//#define DBG_DEFINE_SIZET 1
 
 /* Define required standard integer types (e.g. uint16_t) */
-#define DBG_DEFINE_STDINT 1
+//#define DBG_DEFINE_STDINT 1
 
 /*****************************************************************************
  * Types
@@ -121,6 +126,8 @@ extern void const * const dbg_int_handlers[];
 /*****************************************************************************
  * Prototypes
  ****************************************************************************/
+
+void dbg_sys_init(TcpServer &tS);
 
 int dbg_hook_idt(uint8_t vector, const void *function);
 int dbg_init_gates(void);

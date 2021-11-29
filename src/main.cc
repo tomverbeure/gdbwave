@@ -6,6 +6,7 @@
 #include "CpuTrace.h"
 #include "FstProcess.h"
 #include "TcpServer.h"
+#include "gdbstub.h"
 
 using namespace std;
 
@@ -49,6 +50,14 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
     cout << "    value(" << value << ")" << endl;
 }
 
+void gdb_proc(TcpServer &tcpServer)
+{
+    struct dbg_state    dbg_state;
+
+    dbg_sys_init(tcpServer);
+    dbg_main(&dbg_state);
+}
+
 int main(int argc, char **argv)
 {
     FstProcess  fstProc(fstFileName);
@@ -63,6 +72,9 @@ int main(int argc, char **argv)
 
     TcpServer tcpServer(3333);
 
+    gdb_proc(tcpServer);
+
+#if 0
     unsigned char rxbuf[256];
     int ret;
 
@@ -80,6 +92,7 @@ int main(int argc, char **argv)
     else{
         cout << "Connection error: " << ret << endl;
     }
+#endif
 
     return 0;
 }

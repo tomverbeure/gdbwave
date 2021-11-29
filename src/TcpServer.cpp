@@ -9,6 +9,8 @@
 
 #include "TcpServer.h"
 
+using namespace std;
+
 TcpServer::TcpServer(int port) : port(port)
 {
     open(port);

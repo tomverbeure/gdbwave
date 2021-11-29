@@ -1,7 +1,7 @@
 #ifndef TCP_SERVER_H
 #define TCP_SERVER_H
 
-using namespace std;
+#include <cstddef>
 
 class TcpServer 
 {

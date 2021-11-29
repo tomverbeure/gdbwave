@@ -127,6 +127,8 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
 
 * [ESP8266 gdbstub](https://github.com/espressif/esp-gdbstub)
 
+* [bluespec RISCV_gdbstub](https://github.com/bluespec/RISCV_gdbstub)
+
 
 * gdbstub
 
