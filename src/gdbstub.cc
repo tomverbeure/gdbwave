@@ -20,6 +20,10 @@
  * SOFTWARE.
  */
 
+#include <iostream>
+
+using namespace std;
+
 #include "gdbstub.h"
 
 /*****************************************************************************
@@ -742,7 +746,7 @@ int dbg_read(char *buf, size_t buf_len, size_t len)
 int dbg_main(struct dbg_state *state)
 {
 	address     addr;
-	char        pkt_buf[256];
+	char        pkt_buf[512];
 	int         status;
 	size_t      length;
 	size_t      pkt_len;
@@ -797,6 +801,7 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: g
 		 */
 		case 'g':
+                        cout << "g: read registers" << endl;
 			/* Encode registers */
 			status = dbg_enc_hex(pkt_buf, sizeof(pkt_buf),
 			                     (char *)&(state->registers),
@@ -813,6 +818,7 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: G XX...
 		 */
 		case 'G':
+                        cout << "G: write registers" << endl;
 			status = dbg_dec_hex(pkt_buf+1, pkt_len-1,
 			                     (char *)&(state->registers),
 			                     sizeof(state->registers));
@@ -830,7 +836,9 @@ int dbg_main(struct dbg_state *state)
 			ptr_next += 1;
 			token_expect_integer_arg(addr);
 
-			if (addr >= DBG_CPU_I386_NUM_REGISTERS) {
+                        cout << "p: read register" << addr << endl;
+
+			if (addr >= DBG_CPU_RISCV_NUM_REGISTERS) {
 				goto error;
 			}
 
@@ -853,7 +861,9 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(addr);
 			token_expect_seperator('=');
 
-			if (addr < DBG_CPU_I386_NUM_REGISTERS) {
+                        cout << "p: write register: " << addr << endl;
+
+			if (addr < DBG_CPU_RISCV_NUM_REGISTERS) {
 				status = dbg_dec_hex(ptr_next, token_remaining_buf,
 				                     (char *)&(state->registers[addr]),
 				                     sizeof(state->registers[addr]));
@@ -873,6 +883,8 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(addr);
 			token_expect_seperator(',');
 			token_expect_integer_arg(length);
+
+                        cout << "m: read memory: " << addr << endl;
 
 			/* Read Memory */
 			status = dbg_mem_read(pkt_buf, sizeof(pkt_buf),
@@ -914,6 +926,8 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(length);
 			token_expect_seperator(':');
 
+                        cout << "M: write memory: " << addr << endl;
+
 			/* Write Memory */
 			status = dbg_mem_write(ptr_next, token_remaining_buf,
 			                       addr, length, dbg_dec_bin);
@@ -928,18 +942,27 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: c [addr]
 		 */
 		case 'c':
+                        cout << "c: continue" << endl;
+
 			dbg_continue();
-			return 0;
+			dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x02);     // HALTREQ - SIGINT
+                        break;
 
 		/*
 		 * Single-step
 		 * Command Format: s [addr]
 		 */
 		case 's':
+                        cout << "s: step" << endl;
+
 			dbg_step();
-			return 0;
+                        state->registers[DBG_CPU_RISCV_PC] += 2;
+			dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x05);     // STEP - SIGTRAP
+                        break;
 
 		case '?':
+                        cout << "?: get signal" << endl;
+
 			dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
 			break;
 
@@ -947,6 +970,8 @@ int dbg_main(struct dbg_state *state)
 		 * Unsupported Command
 		 */
 		default:
+                        cout << "Unsupported command: " << pkt_buf[0] << endl;
+
 			dbg_send_packet((const char *)NULL, 0);
 		}
 

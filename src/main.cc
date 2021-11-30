@@ -54,6 +54,12 @@ void gdb_proc(TcpServer &tcpServer)
 {
     struct dbg_state    dbg_state;
 
+    dbg_state.signum                      = 0x02;
+    for(int i=0;i<32;++i){
+        dbg_state.registers[i] = 0x0;
+    }
+    dbg_state.registers[DBG_CPU_RISCV_PC] = 0xd6;
+
     dbg_sys_init(tcpServer);
     dbg_main(&dbg_state);
 }

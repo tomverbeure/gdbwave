@@ -28,25 +28,9 @@
 
 #include "TcpServer.h"
 
-/* Define the size_t type */
-//#define DBG_DEFINE_SIZET 1
-
-/* Define required standard integer types (e.g. uint16_t) */
-//#define DBG_DEFINE_STDINT 1
-
 /*****************************************************************************
  * Types
  ****************************************************************************/
-
-#if DBG_DEFINE_STDINT
-typedef unsigned char  uint8_t;
-typedef unsigned short uint16_t;
-typedef unsigned long  uint32_t;
-#endif
-
-#if DBG_DEFINE_SIZET
-typedef unsigned int size_t;
-#endif
 
 typedef unsigned int address;
 typedef unsigned int reg;
@@ -93,28 +77,45 @@ struct dbg_idt_gate
 #pragma pack()
 
 enum DBG_REGISTER {
-	DBG_CPU_I386_REG_EAX       = 0,
-	DBG_CPU_I386_REG_ECX       = 1,
-	DBG_CPU_I386_REG_EDX       = 2,
-	DBG_CPU_I386_REG_EBX       = 3,
-	DBG_CPU_I386_REG_ESP       = 4,
-	DBG_CPU_I386_REG_EBP       = 5,
-	DBG_CPU_I386_REG_ESI       = 6,
-	DBG_CPU_I386_REG_EDI       = 7,
-	DBG_CPU_I386_REG_PC        = 8,
-	DBG_CPU_I386_REG_PS        = 9,
-	DBG_CPU_I386_REG_CS        = 10,
-	DBG_CPU_I386_REG_SS        = 11,
-	DBG_CPU_I386_REG_DS        = 12,
-	DBG_CPU_I386_REG_ES        = 13,
-	DBG_CPU_I386_REG_FS        = 14,
-	DBG_CPU_I386_REG_GS        = 15,
-	DBG_CPU_I386_NUM_REGISTERS = 16
+	DBG_CPU_RISCV_REG_0         = 0,
+	DBG_CPU_RISCV_REG_1         = 1,
+	DBG_CPU_RISCV_REG_2         = 2,
+	DBG_CPU_RISCV_REG_3         = 3,
+	DBG_CPU_RISCV_REG_4         = 4,
+	DBG_CPU_RISCV_REG_5         = 5,
+	DBG_CPU_RISCV_REG_6         = 6,
+	DBG_CPU_RISCV_REG_7         = 7,
+	DBG_CPU_RISCV_REG_8         = 8,
+	DBG_CPU_RISCV_REG_9         = 9,
+	DBG_CPU_RISCV_REG_10        = 10,
+	DBG_CPU_RISCV_REG_11        = 11,
+	DBG_CPU_RISCV_REG_12        = 12,
+	DBG_CPU_RISCV_REG_13        = 13,
+	DBG_CPU_RISCV_REG_14        = 14,
+	DBG_CPU_RISCV_REG_15        = 15,
+	DBG_CPU_RISCV_REG_16        = 16,
+	DBG_CPU_RISCV_REG_17        = 17,
+	DBG_CPU_RISCV_REG_18        = 18,
+	DBG_CPU_RISCV_REG_19        = 19,
+	DBG_CPU_RISCV_REG_20        = 20,
+	DBG_CPU_RISCV_REG_21        = 21,
+	DBG_CPU_RISCV_REG_22        = 22,
+	DBG_CPU_RISCV_REG_23        = 23,
+	DBG_CPU_RISCV_REG_24        = 24,
+	DBG_CPU_RISCV_REG_25        = 25,
+	DBG_CPU_RISCV_REG_26        = 26,
+	DBG_CPU_RISCV_REG_27        = 27,
+	DBG_CPU_RISCV_REG_28        = 28,
+	DBG_CPU_RISCV_REG_29        = 29,
+	DBG_CPU_RISCV_REG_30        = 30,
+	DBG_CPU_RISCV_REG_31        = 31,
+	DBG_CPU_RISCV_PC            = 32,
+	DBG_CPU_RISCV_NUM_REGISTERS = 33
 };
 
 struct dbg_state {
 	int signum;
-	reg registers[DBG_CPU_I386_NUM_REGISTERS];
+	reg registers[DBG_CPU_RISCV_NUM_REGISTERS];
 };
 
 /*****************************************************************************
