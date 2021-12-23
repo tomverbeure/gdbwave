@@ -752,7 +752,12 @@ int dbg_main(struct dbg_state *state)
 	size_t      pkt_len;
 	const char *ptr_next;
 
-	dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+        int ret;
+
+	ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+        if (ret == EOF){
+            return 0;
+        }
 
 	while (1) {
 		/* Receive the next packet */
@@ -810,7 +815,10 @@ int dbg_main(struct dbg_state *state)
 				goto error;
 			}
 			pkt_len = status;
-			dbg_send_packet(pkt_buf, pkt_len);
+			ret = dbg_send_packet(pkt_buf, pkt_len);
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 		
 		/*
@@ -825,7 +833,10 @@ int dbg_main(struct dbg_state *state)
 			if (status == EOF) {
 				goto error;
 			}
-			dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 
 		/*
@@ -849,7 +860,10 @@ int dbg_main(struct dbg_state *state)
 			if (status == EOF) {
 				goto error;
 			}
-			dbg_send_packet(pkt_buf, status);
+			ret = dbg_send_packet(pkt_buf, status);
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 		
 		/*
@@ -871,7 +885,10 @@ int dbg_main(struct dbg_state *state)
 					goto error;
 				}
 			}
-			dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 		
 		/*
@@ -892,7 +909,11 @@ int dbg_main(struct dbg_state *state)
 			if (status == EOF) {
 				goto error;
 			}
-			dbg_send_packet(pkt_buf, status);
+			ret = dbg_send_packet(pkt_buf, status);
+                        if (ret == EOF){
+                            return 0;
+                        }
+
 			break;
 		
 		/*
@@ -912,7 +933,10 @@ int dbg_main(struct dbg_state *state)
 			if (status == EOF) {
 				goto error;
 			}
-			dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 
 		/*
@@ -934,7 +958,10 @@ int dbg_main(struct dbg_state *state)
 			if (status == EOF) {
 				goto error;
 			}
-			dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 
 		/* 
@@ -945,7 +972,10 @@ int dbg_main(struct dbg_state *state)
                         cout << "c: continue" << endl;
 
 			dbg_continue();
-			dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x02);     // HALTREQ - SIGINT
+			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x02);     // HALTREQ - SIGINT
+                        if (ret == EOF){
+                            return 0;
+                        }
                         break;
 
 		/*
@@ -957,13 +987,19 @@ int dbg_main(struct dbg_state *state)
 
 			dbg_step();
                         state->registers[DBG_CPU_RISCV_PC] += 2;
-			dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x05);     // STEP - SIGTRAP
+			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x05);     // STEP - SIGTRAP
+                        if (ret == EOF){
+                            return 0;
+                        }
                         break;
 
 		case '?':
                         cout << "?: get signal" << endl;
 
-			dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+                        if (ret == EOF){
+                            return 0;
+                        }
 			break;
 
 		/*
@@ -972,13 +1008,19 @@ int dbg_main(struct dbg_state *state)
 		default:
                         cout << "Unsupported command: " << pkt_buf[0] << endl;
 
-			dbg_send_packet((const char *)NULL, 0);
+			ret = dbg_send_packet((const char *)NULL, 0);
+                        if (ret == EOF){
+                            return 0;
+                        }
 		}
 
 		continue;
 
 	error:
-		dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x00);
+		ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x00);
+                if (ret == EOF){
+                    return 0;
+                }
 
 		#undef token_remaining_buf
 		#undef token_expect_seperator

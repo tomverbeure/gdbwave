@@ -19,6 +19,7 @@ TcpServer::TcpServer(int port) : port(port)
 TcpServer::~TcpServer()
 {
     close(socket_fd);
+    close(server_fd);
 }
 
 void TcpServer::open(int port)
@@ -32,10 +33,13 @@ void TcpServer::open(int port)
 
     server_fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == 0) {
+        perror("socket failed");
         throw runtime_error("Socket creation failed.");
     }
 
-#if 0
+#if 1
+    // Both SO_REUSEADDR and SO_REUSEPORT are required to allow the TCP server to restart again immediately
+    // after closing it, but one way or the other, that doesn't work on macOS...
     int                 sock_opt = 1;
     int setsockopt_rc = ::setsockopt(
         server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,     // fails on macOS
@@ -44,6 +48,7 @@ void TcpServer::open(int port)
 
     if (setsockopt_rc) {
         cerr << setsockopt_rc << endl;
+        perror("setsockopt failed");
         throw runtime_error("setsockopt failed.");
     }
 #endif
@@ -52,34 +57,34 @@ void TcpServer::open(int port)
     sock_addr.sin_addr.s_addr = INADDR_ANY;
     sock_addr.sin_port        = htons(this->port);
     if (::bind(server_fd, (struct sockaddr *)&sock_addr, sizeof(sock_addr)) < 0) {
+        perror("bind failed");
         throw runtime_error("bind failed.");
     }
 
     cout << "Waiting for connection on port " << this->port << "..." << endl;
     if (::listen(server_fd, 3) < 0) {
+        perror("listen failed");
         throw runtime_error("listen failed.");
     }
 
     socket_fd = ::accept(server_fd, (struct sockaddr *)&sock_addr, &sock_addr_len);
     if (socket_fd < 0) {
+        perror("accept failed");
         throw runtime_error("accept failed.");
     }
 
     cout << "Connected!" << endl;
 }
 
-size_t TcpServer::xmit(const void *buf, size_t len)
+ssize_t TcpServer::xmit(const void *buf, size_t len)
 {
-    // FIXME: how to do error handling?
-    int ret = ::send(socket_fd, buf, len, 0);
-
+    ssize_t ret = ::send(socket_fd, buf, len, MSG_NOSIGNAL);
     return ret;
 }
 
-size_t TcpServer::recv(void *buf, size_t buf_size)
+ssize_t TcpServer::recv(void *buf, size_t buf_size)
 {
-    int ret = ::read(socket_fd, buf, buf_size);
-
+    ssize_t ret = ::read(socket_fd, buf, buf_size);
     return ret;
 }
 

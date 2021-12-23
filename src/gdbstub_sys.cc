@@ -23,7 +23,7 @@ int dbg_sys_getc(void)
         return rxbuf[rxbuf_cur_idx++];
     }
 
-    size_t ret = tcpServer->recv((void *)rxbuf, RXBUF_SIZE);
+    ssize_t ret = tcpServer->recv((void *)rxbuf, RXBUF_SIZE);
     if (ret > 0){
         rxbuf_cur_idx   = 0;
         rxbuf_len       = ret;

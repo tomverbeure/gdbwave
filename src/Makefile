@@ -9,7 +9,7 @@ RISCV_PREFIX    = riscv64-unknown-elf-
 
 GDB             = $(RISCV_TOOLCHAIN)/$(RISCV_PREFIX)gdb
 
-CXXFLAGS    += --std=c++14 -I. -Wall -g -O0
+CXXFLAGS    += --std=c++14 -I. -Wall -pedantic -g -O0
 LDFLAGS     += -L./fst -Wall -g 
 
 TEST_FST        = ../test_data/top.fst

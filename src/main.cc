@@ -12,6 +12,7 @@
 
 using namespace std;
 
+#if 0
 void fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value, uint32_t len)
 {
     cout << "fst_callback2:" << endl;
@@ -36,6 +37,7 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
     cout << "    len(" << strlen((const char *)value) << ")" << endl;
     cout << "    value(" << value << ")" << endl;
 }
+#endif
 
 void gdb_proc(TcpServer &tcpServer)
 {
@@ -147,9 +149,10 @@ int main(int argc, char **argv)
 
     CpuTrace    cpuTrace(fstProc, clkSig, retiredPcSig, retiredPcValidSig);
 
-    TcpServer tcpServer(3333);
-
-    gdb_proc(tcpServer);
+    while(1){
+        TcpServer tcpServer(3333);
+        gdb_proc(tcpServer);
+    }
 
 #if 0
     unsigned char rxbuf[256];

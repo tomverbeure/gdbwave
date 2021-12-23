@@ -10,12 +10,13 @@ public:
     ~TcpServer();
 
     void open(int port);
-    size_t xmit(const void *buf, size_t len);
-    size_t recv(void *buf, size_t buf_size);
+    ssize_t xmit(const void *buf, size_t len);
+    ssize_t recv(void *buf, size_t buf_size);
 
 private:
-    int port;
+    int server_fd; 
     int socket_fd; 
+    int port;
 };
 
 #endif
