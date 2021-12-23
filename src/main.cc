@@ -1,5 +1,7 @@
 
+#include <unistd.h>
 #include <iostream>
+#include <string>
 
 #include <fst/fstapi.h>
 
@@ -9,21 +11,6 @@
 #include "gdbstub.h"
 
 using namespace std;
-
-char fstFileName[] = "../test_data/top.fst";
-//char fstFileName[] = "../../vexriscv_ocd_blog/tb_ocd/top.fst";
-
-string clk_scope = "TOP.top.u_vex.cpu";
-string clk_name = "clk";
-fstHandle clk_handle = -1;
-
-string retired_pc_scope = "TOP.top.u_vex.cpu";
-string retired_pc_name = "lastStagePc";
-fstHandle retired_pc_handle = -1;
-
-string retired_pc_valid_scope = "TOP.top.u_vex.cpu";
-string retired_pc_valid_name = "lastStageIsValid";
-fstHandle retired_pc_valid_handle = -1;
 
 void fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value, uint32_t len)
 {
@@ -64,17 +51,101 @@ void gdb_proc(TcpServer &tcpServer)
     dbg_main(&dbg_state);
 }
 
+string get_scope(string full_path)
+{
+    int last_dot = full_path.find_last_of('.');
+
+    return full_path.substr(0, last_dot);
+}
+
+string get_local_name(string full_path)
+{
+    int last_dot = full_path.find_last_of('.');
+
+    return full_path.substr(last_dot+1);
+}
+
+void help()
+{
+    fprintf(stderr, "Usage: gdbwave <options>\n");
+    fprintf(stderr, "    -w <FST waveform file>\n");
+    fprintf(stderr, "    -c <hierachical signal of the CPU clock>\n");
+    fprintf(stderr, "    -p <hierachical signal of the CPU program counter>\n");
+    fprintf(stderr, "    -e <hierachical signal of the CPU program counter valid>\n");
+    fprintf(stderr, "\n");
+    fprintf(stderr, "Example: ./gdbwave -w ./test_data/top.fst -c TOP.top.u_vex.cpu -p TOP.top.u_vex.cpu.lastStagePc -e TOP.top.u_vex.cpu.lastStageIsValid\n");
+    fprintf(stderr, "\n");
+}
+
 int main(int argc, char **argv)
 {
-    FstProcess  fstProc(fstFileName);
+    int c;
 
+    string fstFileName; 
+    string cpuClkSignal;
+    string retiredPcSignal;
+    string retiredPcValidSignal;
+
+    // FIXME: eventually, switch to getopt_long?
+    while((c = getopt(argc, argv, "hw:c:p:e:")) != -1){
+        switch(c){
+            case 'h':
+                help();
+                break;
+            case 'w': 
+                fstFileName = optarg;
+                break;
+            case 'c':
+                cpuClkSignal = optarg;
+                break;
+            case 'p':
+                retiredPcSignal = optarg;
+                break;
+            case 'e':
+                retiredPcValidSignal = optarg;
+                break;
+            case '?':
+                return 1;
+        }
+    }
+
+    if (fstFileName.empty()){
+        fprintf(stderr, "FST waveform file not specified!\n\n");
+        return 1;
+    }
+
+    if (cpuClkSignal.empty()){
+        fprintf(stderr, "CPU clock signal not specified!\n\n");
+        return 1;
+    }
+
+    if (retiredPcSignal.empty()){
+        fprintf(stderr, "CPU program counter signal not specified!\n\n");
+        return 1;
+    }
+
+    if (retiredPcValidSignal.empty()){
+        fprintf(stderr, "CPU program counter valid signal not specified!\n\n");
+        return 1;
+    }
+
+    string cpuClkScope = get_scope(cpuClkSignal);
+    string cpuClkName  = get_local_name(cpuClkSignal);
+
+    string retiredPcScope = get_scope(retiredPcSignal);
+    string retiredPcName  = get_local_name(retiredPcSignal);
+
+    string retiredPcValidScope = get_scope(retiredPcValidSignal);
+    string retiredPcValidName  = get_local_name(retiredPcValidSignal);
+
+    FstProcess  fstProc(fstFileName);
     cout << fstProc.infoStr();
 
-    FstSignal clk_sig(clk_scope, clk_name);
-    FstSignal retired_pc_sig(retired_pc_scope, retired_pc_name);
-    FstSignal retired_pc_valid_sig(retired_pc_valid_scope, retired_pc_valid_name);
+    FstSignal clkSig(cpuClkScope, cpuClkName);
+    FstSignal retiredPcSig(retiredPcScope, retiredPcName);
+    FstSignal retiredPcValidSig(retiredPcValidScope, retiredPcValidName);
 
-    CpuTrace    cpuTrace(fstProc, clk_sig, retired_pc_valid_sig, retired_pc_sig);
+    CpuTrace    cpuTrace(fstProc, clkSig, retiredPcSig, retiredPcValidSig);
 
     TcpServer tcpServer(3333);
 

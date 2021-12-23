@@ -12,11 +12,15 @@ GDB             = $(RISCV_TOOLCHAIN)/$(RISCV_PREFIX)gdb
 CXXFLAGS    += --std=c++14 -I. -Wall -g -O0
 LDFLAGS     += -L./fst -Wall -g 
 
+TEST_FST        = ../test_data/top.fst
+TEST_CLK        = TOP.top.u_vex.cpu.clk
+TEST_PC         = TOP.top.u_vex.cpu.lastStagePc 
+TEST_PC_VALID   = TOP.top.u_vex.cpu.lastStageIsValid
+
 all: gdbwave
-	./gdbwave 
 
 run: gdbwave
-	./gdbwave
+	./gdbwave -w $(TEST_FST) -c $(TEST_CLK) -p $(TEST_PC) -e $(TEST_PC_VALID)
 
 gdbwave: fst/libfstapi.a $(OBJ_FILES) $(INC_FILES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $(OBJ_FILES) $(LIB_FILES)

@@ -14,7 +14,11 @@ General plan:
 * Create memory object with initial value
 * extract all memory read and write operations with timestamp
 
+# Current Usage
 
+
+
+# FST
 
 * Info about FST:
 
@@ -161,3 +165,7 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
 
 
 ```
+
+* [`radare2`](https://github.com/radareorg/radare2) reverse engineering tool
+
+     * See also: https://rada.re/n/radare2.html
