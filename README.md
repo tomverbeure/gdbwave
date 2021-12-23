@@ -14,8 +14,27 @@ General plan:
 * Create memory object with initial value
 * extract all memory read and write operations with timestamp
 
-# Current Usage
+# Usage
 
+**Start gdbwave**
+
+```sh
+cd ./src
+make run
+```
+
+This does the following:
+
+* Read in an FST file.
+* Extract all the instruction addresses with associated simulation timestamp.
+* Start a GDB server.
+
+**Start gdb**
+
+```sh
+cd ./test_data/sw_semihosting
+make gdb_only
+```
 
 
 # FST

@@ -1,3 +1,4 @@
+dir ../test_data/sw_semihosting
 set remotelogfile gdb_rsp.log
 set pagination off
 set logging on
