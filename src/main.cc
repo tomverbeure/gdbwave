@@ -39,7 +39,7 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
 }
 #endif
 
-void gdb_proc(TcpServer &tcpServer)
+void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace)
 {
     struct dbg_state    dbg_state;
 
@@ -49,7 +49,7 @@ void gdb_proc(TcpServer &tcpServer)
     }
     dbg_state.registers[DBG_CPU_RISCV_PC] = 0xd6;
 
-    dbg_sys_init(tcpServer);
+    dbg_sys_init(tcpServer, cpuTrace);
     dbg_main(&dbg_state);
 }
 
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
 
     while(1){
         TcpServer tcpServer(3333);
-        gdb_proc(tcpServer);
+        gdb_proc(tcpServer, cpuTrace);
     }
 
 #if 0

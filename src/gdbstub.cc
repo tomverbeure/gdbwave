@@ -986,7 +986,8 @@ int dbg_main(struct dbg_state *state)
                         cout << "s: step" << endl;
 
 			dbg_step();
-                        state->registers[DBG_CPU_RISCV_PC] += 2;
+                        state->registers[DBG_CPU_RISCV_PC] = 2;
+
 			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x05);     // STEP - SIGTRAP
                         if (ret == EOF){
                             return 0;

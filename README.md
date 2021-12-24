@@ -167,7 +167,7 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
                     - call dbg_int_handler()
 
                     arch_x86/gdbstub_sys.c: void dbg_int_handler(struct dbg_interrupt_state *istate)
-                        arch_x86/gdbstub_sys.c: void dbg_inerrupt(struct dbg_interrupt_state *istate)
+                        arch_x86/gdbstub_sys.c: void dbg_interrupt(struct dbg_interrupt_state *istate)
                             - memset dbg_state.registers
                             - set correct signum
                             - copy istate to dbg_state.registers

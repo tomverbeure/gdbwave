@@ -5,11 +5,15 @@
 
 #include "gdbstub_sys.h"
 
-static TcpServer *tcpServer;
+static TcpServer    *tcpServer;
+static CpuTrace     *cpuTrace;
 
-void dbg_sys_init(TcpServer &tS)
+void dbg_sys_init(TcpServer &tS, CpuTrace &cT)
 {
-    tcpServer = &tS;
+    tcpServer   = &tS;
+    cpuTrace    = &cT;
+
+    cpuTrace->pcTraceIt = cpuTrace->pcTrace.begin();
 }
 
 #define RXBUF_SIZE      256
@@ -66,6 +70,9 @@ int dbg_sys_continue(void)
 
 int dbg_sys_step(void)
 {
+    if (cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
+        ++cpuTrace->pcTraceIt;
+    }
     return 0;
 }
 
