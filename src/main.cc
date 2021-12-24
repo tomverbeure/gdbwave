@@ -41,16 +41,7 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
 
 void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace)
 {
-    struct dbg_state    dbg_state;
-
-    dbg_state.signum                      = 0x02;
-    for(int i=0;i<32;++i){
-        dbg_state.registers[i] = 0x0;
-    }
-    dbg_state.registers[DBG_CPU_RISCV_PC] = 0xd6;
-
     dbg_sys_init(tcpServer, cpuTrace);
-    dbg_main(&dbg_state);
 }
 
 string get_scope(string full_path)
@@ -147,7 +138,7 @@ int main(int argc, char **argv)
     FstSignal retiredPcSig(retiredPcScope, retiredPcName);
     FstSignal retiredPcValidSig(retiredPcValidScope, retiredPcValidName);
 
-    CpuTrace    cpuTrace(fstProc, clkSig, retiredPcSig, retiredPcValidSig);
+    CpuTrace    cpuTrace(fstProc, clkSig, retiredPcValidSig, retiredPcSig);
 
     while(1){
         TcpServer tcpServer(3333);

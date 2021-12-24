@@ -3,10 +3,13 @@
 
 #include "TcpServer.h"
 
+#include "gdbstub.h"
 #include "gdbstub_sys.h"
 
 static TcpServer    *tcpServer;
 static CpuTrace     *cpuTrace;
+
+static struct dbg_state dbg_state;
 
 void dbg_sys_init(TcpServer &tS, CpuTrace &cT)
 {
@@ -14,7 +17,23 @@ void dbg_sys_init(TcpServer &tS, CpuTrace &cT)
     cpuTrace    = &cT;
 
     cpuTrace->pcTraceIt = cpuTrace->pcTrace.begin();
+
+    dbg_sys_update_state();
+
+    while(1){
+        dbg_main(&dbg_state);
+    }
 }
+
+void dbg_sys_update_state()
+{
+    for(int i=0;i<32;++i){
+        dbg_state.registers[i] = 0x0;
+    }
+
+    dbg_state.registers[DBG_CPU_RISCV_PC] = cpuTrace->pcTraceIt->pc;
+}
+
 
 #define RXBUF_SIZE      256
 static unsigned char rxbuf[RXBUF_SIZE];
@@ -65,6 +84,9 @@ int dbg_sys_mem_writeb(address addr, char val)
 
 int dbg_sys_continue(void)
 {
+    dbg_state.signum    = 0x02;         // HALTREQ - SIGINT
+    dbg_sys_update_state();
+
     return 0;
 }
 
@@ -73,6 +95,19 @@ int dbg_sys_step(void)
     if (cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
         ++cpuTrace->pcTraceIt;
     }
+
+    printf("dbg_sys_step: PC = 0x%08lx\n", cpuTrace->pcTraceIt->pc);
+
+    dbg_state.signum    = 0x05;         // STEP - SIGTRAP
+    dbg_sys_update_state();
+
     return 0;
 }
+
+int dbg_sys_restart(void)
+{
+    cpuTrace->pcTraceIt = cpuTrace->pcTrace.begin();
+    return 0;
+}
+
 

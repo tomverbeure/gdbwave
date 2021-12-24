@@ -130,6 +130,7 @@ extern void const * const dbg_int_handlers[];
  ****************************************************************************/
 
 void dbg_sys_init(TcpServer &tS, CpuTrace &cT);
+void dbg_sys_update_state();
 
 int dbg_hook_idt(uint8_t vector, const void *function);
 int dbg_init_gates(void);
@@ -143,5 +144,6 @@ void dbg_start(void);
 void dbg_io_write_8(uint16_t port, uint8_t val);
 uint8_t dbg_io_read_8(uint16_t port);
 void *dbg_sys_memset(void *ptr, int data, size_t len);
+int dbg_sys_restart(void);
 
 #endif

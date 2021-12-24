@@ -771,6 +771,12 @@ int dbg_main(struct dbg_state *state)
 			continue;
 		}
 
+                printf("\nReceived command:");
+                for(size_t c=0;c<pkt_len;++c){
+                    printf("%c",pkt_buf[c]);
+                }
+                printf("\n");
+
 		ptr_next = pkt_buf;
 
 		/*
@@ -801,12 +807,42 @@ int dbg_main(struct dbg_state *state)
 				} \
 			}
 
+                /* Restart */
+                case 'R':
+                        printf("R: restart\n");
+
+                        dbg_sys_restart();
+                        break;
+
+                case 'Z': {
+                        int is_hw;
+                        int kind;
+
+			ptr_next += 1;
+			token_expect_integer_arg(is_hw);
+			token_expect_seperator(',');
+			token_expect_integer_arg(addr);
+			token_expect_seperator(',');
+			token_expect_integer_arg(kind);
+
+                        printf("Z: is_hw:%d, addr: 0x%08x, kind: %d\n", is_hw, addr, kind);
+
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return 0;
+                        }
+
+                        break;
+                }
+
 		/*
 		 * Read Registers
 		 * Command Format: g
 		 */
 		case 'g':
                         cout << "g: read registers" << endl;
+                        printf("    PC: 0x%08x\n", state->registers[DBG_CPU_RISCV_PC]);
+
 			/* Encode registers */
 			status = dbg_enc_hex(pkt_buf, sizeof(pkt_buf),
 			                     (char *)&(state->registers),
@@ -821,6 +857,7 @@ int dbg_main(struct dbg_state *state)
                         }
 			break;
 		
+#if 0
 		/*
 		 * Write Registers
 		 * Command Format: G XX...
@@ -838,6 +875,7 @@ int dbg_main(struct dbg_state *state)
                             return 0;
                         }
 			break;
+#endif
 
 		/*
 		 * Read a Register
@@ -866,6 +904,7 @@ int dbg_main(struct dbg_state *state)
                         }
 			break;
 		
+#if 0
 		/*
 		 * Write a Register
 		 * Command Format: P n...=r...
@@ -890,6 +929,7 @@ int dbg_main(struct dbg_state *state)
                             return 0;
                         }
 			break;
+#endif
 		
 		/*
 		 * Read Memory
@@ -901,8 +941,15 @@ int dbg_main(struct dbg_state *state)
 			token_expect_seperator(',');
 			token_expect_integer_arg(length);
 
-                        cout << "m: read memory: " << addr << endl;
+                        printf("m: read memory: 0x%08x (length: %ld)\n", addr, length);
 
+                        // Return E01 when unable to read memory
+		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
+                        if (ret == EOF){
+                            return 0;
+                        }
+
+#if 0
 			/* Read Memory */
 			status = dbg_mem_read(pkt_buf, sizeof(pkt_buf),
 			                      addr, length, dbg_enc_hex);
@@ -913,6 +960,7 @@ int dbg_main(struct dbg_state *state)
                         if (ret == EOF){
                             return 0;
                         }
+#endif
 
 			break;
 		
@@ -926,7 +974,16 @@ int dbg_main(struct dbg_state *state)
 			token_expect_seperator(',');
 			token_expect_integer_arg(length);
 			token_expect_seperator(':');
+                        
+                        printf("M: write memory: 0x%08x (length: %ld)\n", addr, length);
 
+                        // Return E01 when unable to read memory
+		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
+                        if (ret == EOF){
+                            return 0;
+                        }
+
+#if 0
 			/* Write Memory */
 			status = dbg_mem_write(ptr_next, token_remaining_buf,
 			                       addr, length, dbg_dec_hex);
@@ -937,6 +994,7 @@ int dbg_main(struct dbg_state *state)
                         if (ret == EOF){
                             return 0;
                         }
+#endif
 			break;
 
 		/*
@@ -950,8 +1008,15 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(length);
 			token_expect_seperator(':');
 
-                        cout << "M: write memory: " << addr << endl;
+                        printf("X: write memory: 0x%08x (length: %ld)\n", addr, length);
 
+                        // Return E01 when unable to read memory
+		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
+                        if (ret == EOF){
+                            return 0;
+                        }
+
+#if 0
 			/* Write Memory */
 			status = dbg_mem_write(ptr_next, token_remaining_buf,
 			                       addr, length, dbg_dec_bin);
@@ -962,6 +1027,8 @@ int dbg_main(struct dbg_state *state)
                         if (ret == EOF){
                             return 0;
                         }
+#endif
+
 			break;
 
 		/* 
@@ -972,11 +1039,7 @@ int dbg_main(struct dbg_state *state)
                         cout << "c: continue" << endl;
 
 			dbg_continue();
-			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x02);     // HALTREQ - SIGINT
-                        if (ret == EOF){
-                            return 0;
-                        }
-                        break;
+                        return 0;
 
 		/*
 		 * Single-step
@@ -986,13 +1049,7 @@ int dbg_main(struct dbg_state *state)
                         cout << "s: step" << endl;
 
 			dbg_step();
-                        state->registers[DBG_CPU_RISCV_PC] = 2;
-
-			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), 0x05);     // STEP - SIGTRAP
-                        if (ret == EOF){
-                            return 0;
-                        }
-                        break;
+                        return 0;
 
 		case '?':
                         cout << "?: get signal" << endl;
@@ -1002,6 +1059,15 @@ int dbg_main(struct dbg_state *state)
                             return 0;
                         }
 			break;
+
+                case '!':
+                case 'T':
+                case 'H':
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return 0;
+                        }
+                        break;
 
 		/*
 		 * Unsupported Command
@@ -1018,6 +1084,7 @@ int dbg_main(struct dbg_state *state)
 		continue;
 
 	error:
+                printf("Sending error packet...\n");
 		ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x00);
                 if (ret == EOF){
                     return 0;
