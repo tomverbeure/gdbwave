@@ -814,6 +814,7 @@ int dbg_main(struct dbg_state *state)
                         dbg_sys_restart();
                         break;
 
+                case 'z':
                 case 'Z': {
                         int is_hw;
                         int kind;
@@ -826,6 +827,13 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(kind);
 
                         printf("Z: is_hw:%d, addr: 0x%08x, kind: %d\n", is_hw, addr, kind);
+
+                        if (pkt_buf[0] == 'Z'){
+                            dbg_sys_add_breakpoint(addr);
+                        }
+                        else{
+                            dbg_sys_delete_breakpoint(addr);
+                        }
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){

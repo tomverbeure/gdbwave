@@ -145,5 +145,7 @@ void dbg_io_write_8(uint16_t port, uint8_t val);
 uint8_t dbg_io_read_8(uint16_t port);
 void *dbg_sys_memset(void *ptr, int data, size_t len);
 int dbg_sys_restart(void);
+int dbg_sys_add_breakpoint(address);
+int dbg_sys_delete_breakpoint(address);
 
 #endif

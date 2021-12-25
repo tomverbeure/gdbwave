@@ -33,6 +33,9 @@ $(OBJ_FILES): $(INC_FILES)
 gdb: 
 	$(GDB) ../test_data/progmem.elf -x ./gdb_conf.cmd
 
+wave:
+	gtkwave ../test_data/top.fst ../test_data/waves.gtkw
+
 clean:
 	\rm -fr gdbwave *.o
 	cd fst && make clean

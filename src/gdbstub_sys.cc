@@ -1,5 +1,6 @@
 
 #include <cstdio>
+#include <map>
 
 #include "TcpServer.h"
 
@@ -10,6 +11,8 @@ static TcpServer    *tcpServer;
 static CpuTrace     *cpuTrace;
 
 static struct dbg_state dbg_state;
+
+static map<address, bool> breakpoints;
 
 void dbg_sys_init(TcpServer &tS, CpuTrace &cT)
 {
@@ -84,6 +87,17 @@ int dbg_sys_mem_writeb(address addr, char val)
 
 int dbg_sys_continue(void)
 {
+    while(cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
+        address curAddr = cpuTrace->pcTraceIt->pc;
+
+        if (breakpoints[curAddr]){
+            printf("dbg_sys_continue: hit breakpoint at PC = 0x%08lx (time: %ld)\n", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time);
+            break;
+        }
+
+        ++cpuTrace->pcTraceIt;
+    }
+
     dbg_state.signum    = 0x02;         // HALTREQ - SIGINT
     dbg_sys_update_state();
 
@@ -110,4 +124,27 @@ int dbg_sys_restart(void)
     return 0;
 }
 
+
+
+int dbg_sys_add_breakpoint(address addr)
+{
+    auto breakpointIt = breakpoints.find(addr);
+
+    if (breakpointIt == breakpoints.end()){
+        breakpoints[addr] = true;
+    }
+
+    return 0;
+}
+
+int dbg_sys_delete_breakpoint(address addr)
+{
+    auto breakpointIt = breakpoints.find(addr);
+
+    if (breakpointIt != breakpoints.end()){
+        breakpoints.erase(breakpointIt);
+    }
+
+    return 0;
+}
 
