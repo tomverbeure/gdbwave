@@ -17,8 +17,6 @@ public:
     CpuTrace(FstProcess & fstProc, FstSignal clk, FstSignal pcValid, FstSignal pc);
     void init();
 
-    void findNextPcValue(uint64_t startTime, uint64_t pc_value);
-
     // Object to manage access to FST file
     FstProcess &    fstProc;
 

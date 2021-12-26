@@ -1,7 +1,7 @@
 
 
 INC_FILES   = FstProcess.h CpuTrace.h
-OBJ_FILES   = main.o FstProcess.o CpuTrace.o TcpServer.o gdbstub.o gdbstub_sys.o
+OBJ_FILES   = main.o FstProcess.o CpuTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o
 LIB_FILES   = -lfstapi -lz
 
 RISCV_TOOLCHAIN = /opt/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
@@ -20,7 +20,8 @@ TEST_PC_VALID   = TOP.top.u_vex.cpu.lastStageIsValid
 all: gdbwave
 
 run: gdbwave
-	./gdbwave -w $(TEST_FST) -c $(TEST_CLK) -p $(TEST_PC) -e $(TEST_PC_VALID)
+	#./gdbwave -w $(TEST_FST) -c $(TEST_CLK) -p $(TEST_PC) -e $(TEST_PC_VALID)
+	./gdbwave 
 
 gdbwave: fst/libfstapi.a $(OBJ_FILES) $(INC_FILES)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS)  -o $@ $(OBJ_FILES) $(LIB_FILES)

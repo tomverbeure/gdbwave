@@ -79,6 +79,7 @@ bool FstProcess::assignHandles(vector<FstSignal *> &signals)
 
     bool sigNotFound;
 
+    fstReaderIterateHierRewind(fstCtx);
     while((hier = fstReaderIterateHier(fstCtx))){
 
         switch(hier->htyp){

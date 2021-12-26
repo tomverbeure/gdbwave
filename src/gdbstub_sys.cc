@@ -9,17 +9,23 @@
 
 static TcpServer    *tcpServer;
 static CpuTrace     *cpuTrace;
+static MemTrace     *regFileTrace;
 
 static struct dbg_state dbg_state;
 
 static map<address, bool> breakpoints;
 
-void dbg_sys_init(TcpServer &tS, CpuTrace &cT)
+void dbg_sys_init(TcpServer &tS, CpuTrace &cT, MemTrace &rT)
 {
-    tcpServer   = &tS;
-    cpuTrace    = &cT;
+    tcpServer       = &tS;
+    cpuTrace        = &cT;
+    regFileTrace    = &rT;
 
     cpuTrace->pcTraceIt = cpuTrace->pcTrace.begin();
+
+    for(int i=0;i<32;++i){
+        dbg_state.registers[i] = 0xdeadbeef;
+    }
 
     dbg_sys_update_state();
 
@@ -31,7 +37,10 @@ void dbg_sys_init(TcpServer &tS, CpuTrace &cT)
 void dbg_sys_update_state()
 {
     for(int i=0;i<32;++i){
-        dbg_state.registers[i] = 0x0;
+        uint64_t value;
+        if (regFileTrace->getValue(cpuTrace->pcTraceIt->time, i, &value)){
+            dbg_state.registers[i] = (uint32_t)value;
+        }
     }
 
     dbg_state.registers[DBG_CPU_RISCV_PC] = cpuTrace->pcTraceIt->pc;

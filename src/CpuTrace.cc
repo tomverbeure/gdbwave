@@ -67,8 +67,7 @@ void CpuTrace::init()
     curPcVal        = 0;
 
     fstProc.getValueChanges(sigs, pcChangedCB, (void *)this);
+
+    printf("Nr CPU instructions: %ld\n", pcTrace.size());
 }
 
-void CpuTrace::findNextPcValue(uint64_t startTime, uint64_t pc_value)
-{
-}

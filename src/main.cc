@@ -6,6 +6,7 @@
 #include <fst/fstapi.h>
 
 #include "CpuTrace.h"
+#include "MemTrace.h"
 #include "FstProcess.h"
 #include "TcpServer.h"
 #include "gdbstub.h"
@@ -39,9 +40,9 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
 }
 #endif
 
-void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace)
+void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace, MemTrace &regFileTrace)
 {
-    dbg_sys_init(tcpServer, cpuTrace);
+    dbg_sys_init(tcpServer, cpuTrace, regFileTrace);
 }
 
 string get_scope(string full_path)
@@ -79,6 +80,10 @@ int main(int argc, char **argv)
     string retiredPcSignal;
     string retiredPcValidSignal;
 
+    string regFileWriteValidSignal = "TOP.top.u_vex.cpu.lastStageRegFileWrite_valid";
+    string regFileWriteAddrSignal  = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_address";
+    string regFileWriteDataSignal  = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_data";
+
     // FIXME: eventually, switch to getopt_long?
     while((c = getopt(argc, argv, "hw:c:p:e:")) != -1){
         switch(c){
@@ -102,6 +107,7 @@ int main(int argc, char **argv)
         }
     }
 
+#if 0
     if (fstFileName.empty()){
         fprintf(stderr, "FST waveform file not specified!\n\n");
         return 1;
@@ -121,6 +127,23 @@ int main(int argc, char **argv)
         fprintf(stderr, "CPU program counter valid signal not specified!\n\n");
         return 1;
     }
+#else
+    if (fstFileName.empty()){
+        fstFileName             = "../test_data/top.fst";
+    }
+
+    if (cpuClkSignal.empty()){
+        cpuClkSignal            = "TOP.top.u_vex.cpu.clk";
+    }
+
+    if (retiredPcSignal.empty()){
+        retiredPcSignal         = "TOP.top.u_vex.cpu.lastStagePc";
+    }
+
+    if (retiredPcValidSignal.empty()){
+        retiredPcValidSignal    = "TOP.top.u_vex.cpu.lastStageIsValid";
+    }
+#endif
 
     string cpuClkScope = get_scope(cpuClkSignal);
     string cpuClkName  = get_local_name(cpuClkSignal);
@@ -131,10 +154,26 @@ int main(int argc, char **argv)
     string retiredPcValidScope = get_scope(retiredPcValidSignal);
     string retiredPcValidName  = get_local_name(retiredPcValidSignal);
 
+    string regFileWriteValidScope   = get_scope(regFileWriteValidSignal);
+    string regFileWriteValidName    = get_local_name(regFileWriteValidSignal);
+
+    string regFileWriteAddrScope    = get_scope(regFileWriteAddrSignal);
+    string regFileWriteAddrName     = get_local_name(regFileWriteAddrSignal);
+
+    string regFileWriteDataScope    = get_scope(regFileWriteDataSignal);
+    string regFileWriteDataName     = get_local_name(regFileWriteDataSignal);
+
     FstProcess  fstProc(fstFileName);
     cout << fstProc.infoStr();
 
     FstSignal clkSig(cpuClkScope, cpuClkName);
+
+    FstSignal regFileWriteValidSig(regFileWriteValidScope, regFileWriteValidName);
+    FstSignal regFileWriteAddrSig (regFileWriteAddrScope,  regFileWriteAddrName);
+    FstSignal regFileWriteDataSig (regFileWriteDataScope,  regFileWriteDataName);
+
+    MemTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
+
     FstSignal retiredPcSig(retiredPcScope, retiredPcName);
     FstSignal retiredPcValidSig(retiredPcValidScope, retiredPcValidName);
 
@@ -142,7 +181,7 @@ int main(int argc, char **argv)
 
     while(1){
         TcpServer tcpServer(3333);
-        gdb_proc(tcpServer, cpuTrace);
+        gdb_proc(tcpServer, cpuTrace, regFileTrace);
     }
 
 #if 0
