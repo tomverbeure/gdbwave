@@ -1,28 +1,27 @@
 [*]
 [*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
-[*] Fri Dec 24 20:15:26 2021
+[*] Sun Dec 26 07:14:44 2021
 [*]
 [dumpfile] "/home/tom/projects/gdbwave/test_data/top.fst"
 [dumpfile_mtime] "Mon Nov 29 06:35:46 2021"
 [dumpfile_size] 2135906
 [savefile] "/home/tom/projects/gdbwave/test_data/waves.gtkw"
-[timestart] 469100000
+[timestart] 0
 [size] 2096 1374
-[pos] 117 63
-*-25.907537 524800000 662247742 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[pos] 91 49
+*-31.907537 1023000 662247742 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
 [markername] Abreakpoint
 [treeopen] TOP.
-[treeopen] TOP.top.
 [treeopen] TOP.top.u_vex.
-[sst_width] 424
-[signals_width] 395
+[sst_width] 495
+[signals_width] 464
 [sst_expanded] 1
 [sst_vpaned_height] 414
 @28
 TOP.top.u_vex.cpu.clk
 @200
 -
-@29
+@28
 TOP.top.led0
 TOP.top.led1
 TOP.top.led2
@@ -83,5 +82,29 @@ TOP.top.u_vex.cpu.RegFilePlugin_regFile[28][31:0]
 TOP.top.u_vex.cpu.RegFilePlugin_regFile[29][31:0]
 TOP.top.u_vex.cpu.RegFilePlugin_regFile[30][31:0]
 TOP.top.u_vex.cpu.RegFilePlugin_regFile[31][31:0]
+@200
+-
+@28
+TOP.top.u_vex.cpu.lastStageRegFileWrite_valid
+@22
+TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_address[4:0]
+TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_data[31:0]
+@201
+-
+@22
+TOP.top.dBus_cmd_payload_address[31:0]
+TOP.top.dBus_cmd_payload_data[31:0]
+@28
+TOP.top.dBus_cmd_payload_size[1:0]
+TOP.top.dBus_cmd_payload_wr
+TOP.top.dBus_cmd_ready
+TOP.top.dBus_cmd_valid
+@22
+TOP.top.dBus_rsp_data[31:0]
+@28
+TOP.top.dBus_rsp_error
+TOP.top.dBus_rsp_ready
+@22
+TOP.top.dBus_wdata[31:0]
 [pattern_trace] 1
 [pattern_trace] 0

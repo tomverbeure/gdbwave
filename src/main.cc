@@ -81,9 +81,19 @@ int main(int argc, char **argv)
     string retiredPcSignal;
     string retiredPcValidSignal;
 
-    string regFileWriteValidSignal = "TOP.top.u_vex.cpu.lastStageRegFileWrite_valid";
-    string regFileWriteAddrSignal  = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_address";
-    string regFileWriteDataSignal  = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_data";
+    string regFileWriteValidSignal  = "TOP.top.u_vex.cpu.lastStageRegFileWrite_valid";
+    string regFileWriteAddrSignal   = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_address";
+    string regFileWriteDataSignal   = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_data";
+
+    string memCmdValidSignal        = "TOP.top.dBus_cmd_valid";
+    string memCmdReadySignal        = "TOP.top.dBus_cmd_ready";
+    string memCmdAddrSignal         = "TOP.top.dBus_cmd_payload_address";
+    string memCmdSizeSignal         = "TOP.top.dBus_cmd_payload_size";
+    string memCmdWrSignal           = "TOP.top.dBus_cmd_payload_wr";
+    string memCmdWrDataSignal       = "TOP.top.dBus_cmd_payload_data";
+    string memRspValidSignal        = "TOP.top.dBus_rsp_ready";
+    string memRspRdDataSignal       = "TOP.top.dBus_rsp_data";
+
 
     // FIXME: eventually, switch to getopt_long?
     while((c = getopt(argc, argv, "hw:c:p:e:")) != -1){
@@ -146,40 +156,30 @@ int main(int argc, char **argv)
     }
 #endif
 
-    string cpuClkScope = get_scope(cpuClkSignal);
-    string cpuClkName  = get_local_name(cpuClkSignal);
-
-    string retiredPcScope = get_scope(retiredPcSignal);
-    string retiredPcName  = get_local_name(retiredPcSignal);
-
-    string retiredPcValidScope = get_scope(retiredPcValidSignal);
-    string retiredPcValidName  = get_local_name(retiredPcValidSignal);
-
-    string regFileWriteValidScope   = get_scope(regFileWriteValidSignal);
-    string regFileWriteValidName    = get_local_name(regFileWriteValidSignal);
-
-    string regFileWriteAddrScope    = get_scope(regFileWriteAddrSignal);
-    string regFileWriteAddrName     = get_local_name(regFileWriteAddrSignal);
-
-    string regFileWriteDataScope    = get_scope(regFileWriteDataSignal);
-    string regFileWriteDataName     = get_local_name(regFileWriteDataSignal);
-
     FstProcess  fstProc(fstFileName);
     cout << fstProc.infoStr();
 
-    FstSignal clkSig(cpuClkScope, cpuClkName);
+    FstSignal clkSig(cpuClkSignal);
 
-    FstSignal regFileWriteValidSig(regFileWriteValidScope, regFileWriteValidName);
-    FstSignal regFileWriteAddrSig (regFileWriteAddrScope,  regFileWriteAddrName);
-    FstSignal regFileWriteDataSig (regFileWriteDataScope,  regFileWriteDataName);
+    FstSignal retiredPcSig     (retiredPcSignal);
+    FstSignal retiredPcValidSig(retiredPcValidSignal);
 
+    FstSignal regFileWriteValidSig(regFileWriteValidSignal);
+    FstSignal regFileWriteAddrSig (regFileWriteAddrSignal);
+    FstSignal regFileWriteDataSig (regFileWriteDataSignal);
+
+    FstSignal memCmdValidSig   (memCmdValidSignal);
+    FstSignal memCmdReadySig   (memCmdReadySignal);
+    FstSignal memCmdAddrSig    (memCmdAddrSignal);
+    FstSignal memCmdSizeSig    (memCmdSizeSignal);
+    FstSignal memCmdWrSig      (memCmdWrSignal);
+    FstSignal memCmdWrDataSig  (memCmdWrDataSignal);
+    FstSignal memCmdRspValidSig(memRspValidSignal);
+    FstSignal memCmdRspDataSig (memRspRdDataSignal);
+
+    CpuTrace        cpuTrace(fstProc, clkSig, retiredPcValidSig, retiredPcSig);
     RegFileTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
-    MemTrace        memTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
-
-    FstSignal retiredPcSig(retiredPcScope, retiredPcName);
-    FstSignal retiredPcValidSig(retiredPcValidScope, retiredPcValidName);
-
-    CpuTrace    cpuTrace(fstProc, clkSig, retiredPcValidSig, retiredPcSig);
+    MemTrace        memTrace(fstProc, clkSig, memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, memCmdRspValidSig, memCmdRspDataSig);
 
     while(1){
         TcpServer tcpServer(3333);

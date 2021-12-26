@@ -16,11 +16,21 @@ class FstSignal
 public:
     FstSignal() : hasHandle(false) {}
     FstSignal(string scopeName, string name) : scopeName(scopeName), name(name), hasHandle(false) {}
+    FstSignal(string fullName) : scopeName(getScope(fullName)), name(getLocalName(fullName)), hasHandle(false) {}
 
     string      scopeName;
     string      name;
     bool        hasHandle;
     fstHandle   handle;
+
+    static string getScope(string full_path){ 
+        int last_dot = full_path.find_last_of('.');
+        return full_path.substr(0, last_dot);
+    }
+    static string getLocalName(string full_path){
+        int last_dot = full_path.find_last_of('.');
+        return full_path.substr(last_dot+1);
+    }
 };
 
 class FstProcess
