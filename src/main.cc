@@ -7,6 +7,7 @@
 
 #include "CpuTrace.h"
 #include "MemTrace.h"
+#include "RegFileTrace.h"
 #include "FstProcess.h"
 #include "TcpServer.h"
 #include "gdbstub.h"
@@ -40,9 +41,9 @@ void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txi
 }
 #endif
 
-void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace, MemTrace &regFileTrace)
+void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace, RegFileTrace &regFileTrace, MemTrace &memTrace)
 {
-    dbg_sys_init(tcpServer, cpuTrace, regFileTrace);
+    dbg_sys_init(tcpServer, cpuTrace, regFileTrace, memTrace);
 }
 
 string get_scope(string full_path)
@@ -172,7 +173,8 @@ int main(int argc, char **argv)
     FstSignal regFileWriteAddrSig (regFileWriteAddrScope,  regFileWriteAddrName);
     FstSignal regFileWriteDataSig (regFileWriteDataScope,  regFileWriteDataName);
 
-    MemTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
+    RegFileTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
+    MemTrace        memTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
 
     FstSignal retiredPcSig(retiredPcScope, retiredPcName);
     FstSignal retiredPcValidSig(retiredPcValidScope, retiredPcValidName);
@@ -181,7 +183,7 @@ int main(int argc, char **argv)
 
     while(1){
         TcpServer tcpServer(3333);
-        gdb_proc(tcpServer, cpuTrace, regFileTrace);
+        gdb_proc(tcpServer, cpuTrace, regFileTrace, memTrace);
     }
 
 #if 0

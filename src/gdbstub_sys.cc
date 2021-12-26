@@ -9,13 +9,13 @@
 
 static TcpServer    *tcpServer;
 static CpuTrace     *cpuTrace;
-static MemTrace     *regFileTrace;
+static RegFileTrace *regFileTrace;
 
 static struct dbg_state dbg_state;
 
 static map<address, bool> breakpoints;
 
-void dbg_sys_init(TcpServer &tS, CpuTrace &cT, MemTrace &rT)
+void dbg_sys_init(TcpServer &tS, CpuTrace &cT, RegFileTrace &rT, MemTrace &mT)
 {
     tcpServer       = &tS;
     cpuTrace        = &cT;

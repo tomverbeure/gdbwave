@@ -28,6 +28,7 @@
 
 #include "TcpServer.h"
 #include "CpuTrace.h"
+#include "RegFileTrace.h"
 #include "MemTrace.h"
 
 /*****************************************************************************
@@ -130,7 +131,7 @@ extern void const * const dbg_int_handlers[];
  * Prototypes
  ****************************************************************************/
 
-void dbg_sys_init(TcpServer &tS, CpuTrace &cT, MemTrace &rT);
+void dbg_sys_init(TcpServer &tS, CpuTrace &cT, RegFileTrace &rT, MemTrace &mT);
 void dbg_sys_update_state();
 
 int dbg_hook_idt(uint8_t vector, const void *function);

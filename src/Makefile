@@ -1,7 +1,7 @@
 
 
 INC_FILES   = FstProcess.h CpuTrace.h
-OBJ_FILES   = main.o FstProcess.o CpuTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o
+OBJ_FILES   = main.o FstProcess.o CpuTrace.o RegFileTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o
 LIB_FILES   = -lfstapi -lz
 
 RISCV_TOOLCHAIN = /opt/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
