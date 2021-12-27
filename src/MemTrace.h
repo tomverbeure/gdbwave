@@ -17,7 +17,8 @@ struct MemAccess
 class MemTrace
 {
 public:
-    MemTrace(FstProcess & fstProc, FstSignal clk, 
+    MemTrace(FstProcess & fstProc, string memInitFilename, int memInitStartAddr,  
+                FstSignal clk, 
                 FstSignal memCmdValid, FstSignal memCmdReady, FstSignal memCmdAddr, FstSignal memCmdSize, FstSignal memCmdWr, FstSignal memCmdWrData,
                 FstSignal memRspValid, FstSignal memRspData);
 
@@ -27,6 +28,11 @@ public:
 
     // Object to manage access to FST file
     FstProcess &    fstProc;
+
+    // Memory initialization values at bootup
+    string              memInitFilename;
+    unsigned int        memInitStartAddr;
+    std::vector<char>   memInitContents;
 
     // Handles to signals inside the FST file
     FstSignal       clk;
@@ -56,7 +62,7 @@ public:
 
     void processSignalChanged(uint64_t time, FstSignal *signal, const unsigned char *value);
 
-    bool getValue(uint64_t time, uint64_t addr, uint64_t *value);
+    bool getValue(uint64_t time, uint64_t addr, char *value);
 };
 
 #endif

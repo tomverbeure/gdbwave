@@ -48,10 +48,13 @@ CREATE_MIF      = ../misc/create_mif.rb
 
 .PHONY: all clean 
 
-all: progmem.dis 
+all: progmem.dis progmem.bin
 
 progmem.dis: progmem.elf
 	$(OBJDUMP) -s -D $< > $@
+
+progmem.bin: progmem.elf
+	$(OBJCOPY) -O binary $< $@
 
 progmem.elf: $(OBJ_FILES) top_defines.h sections.lds Makefile 
 	$(LD) $(LDFLAGS) -o $@ $(OBJ_FILES) -lm 

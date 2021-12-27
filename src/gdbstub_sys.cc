@@ -10,6 +10,7 @@
 static TcpServer    *tcpServer;
 static CpuTrace     *cpuTrace;
 static RegFileTrace *regFileTrace;
+static MemTrace     *memTrace;
 
 static struct dbg_state dbg_state;
 
@@ -20,6 +21,7 @@ void dbg_sys_init(TcpServer &tS, CpuTrace &cT, RegFileTrace &rT, MemTrace &mT)
     tcpServer       = &tS;
     cpuTrace        = &cT;
     regFileTrace    = &rT;
+    memTrace        = &mT;
 
     cpuTrace->pcTraceIt = cpuTrace->pcTrace.begin();
 
@@ -86,6 +88,7 @@ int dbg_sys_putchar(int ch)
 
 int dbg_sys_mem_readb(address addr, char *val)
 {
+    memTrace->getValue(cpuTrace->pcTraceIt->time, addr, val);
     return 0;
 }
 
@@ -107,7 +110,7 @@ int dbg_sys_continue(void)
         ++cpuTrace->pcTraceIt;
     }
 
-    dbg_state.signum    = 0x02;         // HALTREQ - SIGINT
+    dbg_state.signum    = 0x05;         // SIGTRAP
     dbg_sys_update_state();
 
     return 0;
@@ -121,7 +124,7 @@ int dbg_sys_step(void)
 
     printf("dbg_sys_step: PC = 0x%08lx\n", cpuTrace->pcTraceIt->pc);
 
-    dbg_state.signum    = 0x05;         // STEP - SIGTRAP
+    dbg_state.signum    = 0x05;         // SIGTRAP
     dbg_sys_update_state();
 
     return 0;

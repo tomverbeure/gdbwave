@@ -2,16 +2,20 @@
 #include <stdio.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 using namespace std;
 
 #include "MemTrace.h"
 
-MemTrace::MemTrace(FstProcess & fstProc, FstSignal clk, 
+MemTrace::MemTrace(FstProcess & fstProc, string memInitFilename, int memInitStartAddr,  
+                FstSignal clk, 
                 FstSignal memCmdValid, FstSignal memCmdReady, FstSignal memCmdAddr, FstSignal memCmdSize, FstSignal memCmdWr, FstSignal memCmdWrData,
                 FstSignal memRspValid, FstSignal memRspData) :
     fstProc(fstProc), 
+    memInitFilename(memInitFilename),
+    memInitStartAddr(memInitStartAddr),
     clk(clk),
     memCmdValid(memCmdValid),
     memCmdReady(memCmdReady),
@@ -106,6 +110,12 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
 
 void MemTrace::init()
 {
+    if (!memInitFilename.empty()){
+        printf("Loading mem init file: %s\n", memInitFilename.c_str());
+        ifstream initFile(memInitFilename, ios::in | ios::binary);
+        memInitContents = vector<char>((std::istreambuf_iterator<char>(initFile)), std::istreambuf_iterator<char>());
+    }
+
     vector<FstSignal *> sigs;
 
     sigs.push_back(&clk);
@@ -146,10 +156,15 @@ void MemTrace::init()
 }
 
 
-bool MemTrace::getValue(uint64_t time, uint64_t addr, uint64_t *value)
+bool MemTrace::getValue(uint64_t time, uint64_t addr, char *value)
 {
     bool        valueValid = false;
-    uint64_t    val;
+    uint64_t    val = 0;
+
+    if (addr >= memInitStartAddr && addr < (memInitStartAddr + memInitContents.size())){
+        valueValid = true;
+        val = memInitContents[addr - memInitStartAddr];
+    }
 
     for(auto m: memTrace){
         if (m.time > time)
@@ -161,9 +176,7 @@ bool MemTrace::getValue(uint64_t time, uint64_t addr, uint64_t *value)
         }
     }
 
-    if (valueValid){
-        *value      = val;
-    }
+    *value      = val;
 
     return valueValid;
 }

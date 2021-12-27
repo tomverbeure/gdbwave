@@ -1,7 +1,7 @@
 
 
 INC_FILES   = FstProcess.h CpuTrace.h
-OBJ_FILES   = main.o FstProcess.o CpuTrace.o RegFileTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o
+OBJ_FILES   = main.o FstProcess.o CpuTrace.o RegFileTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o femto_elf.o
 LIB_FILES   = -lfstapi -lz
 
 RISCV_TOOLCHAIN = /opt/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
@@ -9,7 +9,7 @@ RISCV_PREFIX    = riscv64-unknown-elf-
 
 GDB             = $(RISCV_TOOLCHAIN)/$(RISCV_PREFIX)gdb
 
-CXXFLAGS    += --std=c++14 -I. -Wall -pedantic -g -O0
+CXXFLAGS    += --std=c++14 -I. -Wall -pedantic -g -O0 -DSTANDALONE_FEMTOELF
 LDFLAGS     += -L./fst -Wall -g 
 
 TEST_FST        = ../test_data/top.fst

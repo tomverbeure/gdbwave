@@ -951,13 +951,13 @@ int dbg_main(struct dbg_state *state)
 
                         printf("m: read memory: 0x%08x (length: %ld)\n", addr, length);
 
+#if 0
                         // Return E01 when unable to read memory
 		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
                         if (ret == EOF){
                             return 0;
                         }
-
-#if 0
+#else
 			/* Read Memory */
 			status = dbg_mem_read(pkt_buf, sizeof(pkt_buf),
 			                      addr, length, dbg_enc_hex);

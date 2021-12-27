@@ -12,6 +12,8 @@
 #include "TcpServer.h"
 #include "gdbstub.h"
 
+//#include "femto_elf.h"
+
 using namespace std;
 
 #if 0
@@ -94,6 +96,16 @@ int main(int argc, char **argv)
     string memRspValidSignal        = "TOP.top.dBus_rsp_ready";
     string memRspRdDataSignal       = "TOP.top.dBus_rsp_data";
 
+    string memInitFilename          = "../test_data/progmem.bin";
+    int memInitStartAddr            = 0;
+
+#if 0
+    Elf32Info elfInfo;
+
+    elf32_stat("../test_data/sw_semihosting/progmem.elf", &elfInfo);
+    exit(0);
+#endif
+
 
     // FIXME: eventually, switch to getopt_long?
     while((c = getopt(argc, argv, "hw:c:p:e:")) != -1){
@@ -174,12 +186,16 @@ int main(int argc, char **argv)
     FstSignal memCmdSizeSig    (memCmdSizeSignal);
     FstSignal memCmdWrSig      (memCmdWrSignal);
     FstSignal memCmdWrDataSig  (memCmdWrDataSignal);
-    FstSignal memCmdRspValidSig(memRspValidSignal);
-    FstSignal memCmdRspDataSig (memRspRdDataSignal);
+    FstSignal memRspValidSig   (memRspValidSignal);
+    FstSignal memRspDataSig    (memRspRdDataSignal);
 
     CpuTrace        cpuTrace(fstProc, clkSig, retiredPcValidSig, retiredPcSig);
     RegFileTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
-    MemTrace        memTrace(fstProc, clkSig, memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, memCmdRspValidSig, memCmdRspDataSig);
+    MemTrace        memTrace(fstProc, 
+                             memInitFilename, memInitStartAddr,
+                             clkSig, 
+                             memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, 
+                             memRspValidSig, memRspDataSig);
 
     while(1){
         TcpServer tcpServer(3333);
