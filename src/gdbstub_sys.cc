@@ -103,11 +103,16 @@ int dbg_sys_continue(void)
         address curAddr = cpuTrace->pcTraceIt->pc;
 
         if (breakpoints[curAddr]){
-            printf("dbg_sys_continue: hit breakpoint at PC = 0x%08lx (time: %ld)\n", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time);
+            printf("dbg_sys_continue: hit breakpoint at PC = 0x%08lx (time: %ld, %ld out of %ld)\n", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
             break;
         }
 
         ++cpuTrace->pcTraceIt;
+    }
+
+    if (cpuTrace->pcTraceIt == cpuTrace->pcTrace.end()){
+        printf("Reached end of execution!!!\n");
+        cpuTrace->pcTraceIt = cpuTrace->pcTrace.end() -1;
     }
 
     dbg_state.signum    = 0x05;         // SIGTRAP
@@ -121,8 +126,12 @@ int dbg_sys_step(void)
     if (cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
         ++cpuTrace->pcTraceIt;
     }
+    else{
+        printf("Reached end of execution!!!\n");
+        cpuTrace->pcTraceIt = cpuTrace->pcTrace.end()-1;
+    }
 
-    printf("dbg_sys_step: PC = 0x%08lx\n", cpuTrace->pcTraceIt->pc);
+    printf("dbg_sys_step: PC = 0x%08lx (time: %ld, %ld out of %ld)\n", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
 
     dbg_state.signum    = 0x05;         // SIGTRAP
     dbg_sys_update_state();
@@ -144,8 +153,9 @@ int dbg_sys_add_breakpoint(address addr)
 
     if (breakpointIt == breakpoints.end()){
         breakpoints[addr] = true;
+        printf("Breakpoint added. Nr of breakpoints: %ld\n", breakpoints.size());
     }
-
+    
     return 0;
 }
 
@@ -155,6 +165,7 @@ int dbg_sys_delete_breakpoint(address addr)
 
     if (breakpointIt != breakpoints.end()){
         breakpoints.erase(breakpointIt);
+        printf("Breakpoint deleted. Nr of breakpoints: %ld\n", breakpoints.size());
     }
 
     return 0;
