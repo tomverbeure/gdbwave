@@ -148,10 +148,6 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
     * https://github.com/bminor/binutils-gdb/blob/master/gdb/features/riscv/32bit-cpu.xml
     * (derived) https://github.com/bminor/binutils-gdb/blob/master/gdb/features/riscv/32bit-cpu.c
 
-* [ESP8266 gdbstub](https://github.com/espressif/esp-gdbstub)
-
-* [bluespec RISCV_gdbstub](https://github.com/bluespec/RISCV_gdbstub)
-
 
 * gdbstub
 
