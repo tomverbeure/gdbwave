@@ -754,6 +754,7 @@ int dbg_main(struct dbg_state *state)
 
         int ret;
 
+        printf("Signal %d\n", state->signum);
 	ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
         if (ret == EOF){
             return 0;

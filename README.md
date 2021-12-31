@@ -36,7 +36,6 @@ cd ./test_data/sw_semihosting
 make gdb_only
 ```
 
-
 # FST
 
 * Info about FST:
@@ -184,3 +183,15 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
 * [`radare2`](https://github.com/radareorg/radare2) reverse engineering tool
 
      * See also: https://rada.re/n/radare2.html
+
+**TODO/Limitations**
+
+* Configure snooping signals with config file
+* Fix 'next' issue 
+* Link with GTKWave
+* Support superscalar CPUs
+* Load ELF files directly
+* Support complex memory maps
+* Decode register file and memory reads
+* Support for RISC-V instruction tracing decompression
+

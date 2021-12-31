@@ -66,6 +66,7 @@ void help()
 {
     fprintf(stderr, "Usage: gdbwave <options>\n");
     fprintf(stderr, "    -w <FST waveform file>\n");
+    fprintf(stderr, "    -b <memory contents binary file>\n");
     fprintf(stderr, "    -c <hierachical signal of the CPU clock>\n");
     fprintf(stderr, "    -p <hierachical signal of the CPU program counter>\n");
     fprintf(stderr, "    -e <hierachical signal of the CPU program counter valid>\n");
@@ -96,7 +97,7 @@ int main(int argc, char **argv)
     string memRspValidSignal        = "TOP.top.dBus_rsp_ready";
     string memRspRdDataSignal       = "TOP.top.dBus_rsp_data";
 
-    string memInitFilename          = "../test_data/progmem.bin";
+    string memInitFileName          = "../test_data/progmem.bin";
     int memInitStartAddr            = 0;
 
 #if 0
@@ -108,13 +109,16 @@ int main(int argc, char **argv)
 
 
     // FIXME: eventually, switch to getopt_long?
-    while((c = getopt(argc, argv, "hw:c:p:e:")) != -1){
+    while((c = getopt(argc, argv, "hw:b:c:p:e:")) != -1){
         switch(c){
             case 'h':
                 help();
                 break;
             case 'w': 
                 fstFileName = optarg;
+                break;
+            case 'b': 
+                memInitFileName = optarg;
                 break;
             case 'c':
                 cpuClkSignal = optarg;
@@ -192,7 +196,7 @@ int main(int argc, char **argv)
     CpuTrace        cpuTrace(fstProc, clkSig, retiredPcValidSig, retiredPcSig);
     RegFileTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
     MemTrace        memTrace(fstProc, 
-                             memInitFilename, memInitStartAddr,
+                             memInitFileName, memInitStartAddr,
                              clkSig, 
                              memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, 
                              memRspValidSig, memRspDataSig);
