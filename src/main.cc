@@ -1,7 +1,9 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <algorithm>
 
 #include <fst/fstapi.h>
 
@@ -12,41 +14,32 @@
 #include "TcpServer.h"
 #include "gdbstub.h"
 
-//#include "femto_elf.h"
+#define DEBUG   1
 
 using namespace std;
 
-#if 0
-void fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value, uint32_t len)
-{
-    cout << "fst_callback2:" << endl;
-    (void)user_callback_data_pointer;
+struct ConfigParams {
+    string fstFileName; 
+    string cpuClkSignal;
+    string retiredPcSignal;
+    string retiredPcValidSignal;
 
-    cout << "    time(" << time << ")" << endl;
-    cout << "    facidx(" << txidx << ")" << endl;
-    cout << "    len(" << len << ")" << endl;
+    string regFileWriteValidSignal;
+    string regFileWriteAddrSignal;
+    string regFileWriteDataSignal;
 
-    for(uint32_t i=0; i< len; ++i){
-    }
-}
+    string memCmdValidSignal;
+    string memCmdReadySignal;
+    string memCmdAddrSignal;
+    string memCmdSizeSignal;
+    string memCmdWrSignal;
+    string memCmdWrDataSignal;
+    string memRspValidSignal;
+    string memRspRdDataSignal;
 
-void fst_callback(void *user_callback_data_pointer, uint64_t time, fstHandle txidx, const unsigned char *value)
-{
-//    fst_callback2(user_callback_data_pointer, tim, txidx, value, 0);
-    cout << "fst_callback:" << endl;
-    (void)user_callback_data_pointer;
-
-    cout << "    time(" << time << ")" << endl;
-    cout << "    facidx(" << txidx << ")" << endl;
-    cout << "    len(" << strlen((const char *)value) << ")" << endl;
-    cout << "    value(" << value << ")" << endl;
-}
-#endif
-
-void gdb_proc(TcpServer &tcpServer, CpuTrace &cpuTrace, RegFileTrace &regFileTrace, MemTrace &memTrace)
-{
-    dbg_sys_init(tcpServer, cpuTrace, regFileTrace, memTrace);
-}
+    string memInitFileName;
+    int memInitStartAddr;
+};
 
 string get_scope(string full_path)
 {
@@ -67,49 +60,78 @@ void help()
     fprintf(stderr, "Usage: gdbwave <options>\n");
     fprintf(stderr, "    -w <FST waveform file>\n");
     fprintf(stderr, "    -b <memory contents binary file>\n");
-    fprintf(stderr, "    -c <hierachical signal of the CPU clock>\n");
-    fprintf(stderr, "    -p <hierachical signal of the CPU program counter>\n");
-    fprintf(stderr, "    -e <hierachical signal of the CPU program counter valid>\n");
+    fprintf(stderr, "    -c <config parameter file>\n");
+    fprintf(stderr, "    -v verbose\n");
     fprintf(stderr, "\n");
-    fprintf(stderr, "Example: ./gdbwave -w ./test_data/top.fst -c TOP.top.u_vex.cpu -p TOP.top.u_vex.cpu.lastStagePc -e TOP.top.u_vex.cpu.lastStageIsValid\n");
+    fprintf(stderr, "Example: ./gdbwave -w ./test_data/top.fst -c ./test_data/configParams.txt\n");
     fprintf(stderr, "\n");
+}
+
+void parseConfig(ifstream & configFile, ConfigParams &c)
+{
+    string line;
+
+    while(getline(configFile, line)){
+        line.erase(remove_if(line.begin(), line.end(), ::isspace), line.end());
+        if (line[0] == '#' || line.empty())
+            continue;
+        auto delimiterPos   = line.find("=");
+        auto name           = line.substr(0, delimiterPos);
+        auto value          = line.substr(delimiterPos+1);
+
+        name.erase(remove_if(name.begin(), name.end(), ::isspace), name.end());
+        value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
+
+        if (name == "cpuClk")
+            c.cpuClkSignal                  = value;
+        else if (name == "retiredPc")
+            c.retiredPcSignal               = value;
+        else if (name == "retiredPcValid")
+            c.retiredPcValidSignal          = value;
+        else if (name == "regFileWriteValid")
+            c.regFileWriteValidSignal       = value;
+        else if (name == "regFileWriteAddr")
+            c.regFileWriteAddrSignal        = value;
+        else if (name == "regFileWriteData")
+            c.regFileWriteDataSignal        = value;
+
+        else if (name == "memCmdValid")
+            c.memCmdValidSignal             = value;
+        else if (name == "memCmdReady")
+            c.memCmdReadySignal             = value;
+        else if (name == "memCmdAddr")
+            c.memCmdAddrSignal              = value;
+        else if (name == "memCmdSize")
+            c.memCmdSizeSignal              = value;
+        else if (name == "memCmdWr")
+            c.memCmdWrSignal                = value;
+        else if (name == "memCmdWrData")
+            c.memCmdWrDataSignal            = value;
+        else if (name == "memRspValid")
+            c.memRspValidSignal             = value;
+        else if (name == "memRspRdData")
+            c.memRspRdDataSignal            = value;
+
+        else if (name == "memInitFile")
+            c.memInitFileName               = value;
+        else if (name == "memInitStartAddr")
+            c.memInitStartAddr              = stoi(value);
+
+        cout << name << " " << value << endl;
+    }
 }
 
 int main(int argc, char **argv)
 {
     int c;
 
+    ConfigParams configParams;
+
+
     string fstFileName; 
-    string cpuClkSignal;
-    string retiredPcSignal;
-    string retiredPcValidSignal;
+    string configParamsFileName;
 
-    string regFileWriteValidSignal  = "TOP.top.u_vex.cpu.lastStageRegFileWrite_valid";
-    string regFileWriteAddrSignal   = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_address";
-    string regFileWriteDataSignal   = "TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_data";
-
-    string memCmdValidSignal        = "TOP.top.dBus_cmd_valid";
-    string memCmdReadySignal        = "TOP.top.dBus_cmd_ready";
-    string memCmdAddrSignal         = "TOP.top.dBus_cmd_payload_address";
-    string memCmdSizeSignal         = "TOP.top.dBus_cmd_payload_size";
-    string memCmdWrSignal           = "TOP.top.dBus_cmd_payload_wr";
-    string memCmdWrDataSignal       = "TOP.top.dBus_cmd_payload_data";
-    string memRspValidSignal        = "TOP.top.dBus_rsp_ready";
-    string memRspRdDataSignal       = "TOP.top.dBus_rsp_data";
-
-    string memInitFileName          = "../test_data/progmem.bin";
-    int memInitStartAddr            = 0;
-
-#if 0
-    Elf32Info elfInfo;
-
-    elf32_stat("../test_data/sw_semihosting/progmem.elf", &elfInfo);
-    exit(0);
-#endif
-
-
-    // FIXME: eventually, switch to getopt_long?
-    while((c = getopt(argc, argv, "hw:b:c:p:e:")) != -1){
+    while((c = getopt(argc, argv, "hw:c:v")) != -1){
         switch(c){
             case 'h':
                 help();
@@ -117,114 +139,84 @@ int main(int argc, char **argv)
             case 'w': 
                 fstFileName = optarg;
                 break;
-            case 'b': 
-                memInitFileName = optarg;
-                break;
             case 'c':
-                cpuClkSignal = optarg;
-                break;
-            case 'p':
-                retiredPcSignal = optarg;
-                break;
-            case 'e':
-                retiredPcValidSignal = optarg;
+                configParamsFileName = optarg;
                 break;
             case '?':
                 return 1;
         }
     }
 
-#if 0
+#if DEBUG==1
+    if (fstFileName.empty()){
+        fstFileName             = "../test_data/top.fst";
+    }
+    if (configParamsFileName.empty()){
+        configParamsFileName    = "../test_data/configParams.txt";
+    }
+#else
     if (fstFileName.empty()){
         fprintf(stderr, "FST waveform file not specified!\n\n");
         return 1;
     }
 
-    if (cpuClkSignal.empty()){
+    if (configParamsFileName.empty()){
+        fprintf(stderr, "Configuration parameter file not specified!\n\n");
+        return 1;
+    }
+#endif
+
+    ifstream configFile(configParamsFileName, ios::in);
+    parseConfig(configFile, configParams);
+
+    if (configParams.cpuClkSignal.empty()){
         fprintf(stderr, "CPU clock signal not specified!\n\n");
         return 1;
     }
 
-    if (retiredPcSignal.empty()){
+    if (configParams.retiredPcSignal.empty()){
         fprintf(stderr, "CPU program counter signal not specified!\n\n");
         return 1;
     }
 
-    if (retiredPcValidSignal.empty()){
+    if (configParams.retiredPcValidSignal.empty()){
         fprintf(stderr, "CPU program counter valid signal not specified!\n\n");
         return 1;
     }
-#else
-    if (fstFileName.empty()){
-        fstFileName             = "../test_data/top.fst";
-    }
-
-    if (cpuClkSignal.empty()){
-        cpuClkSignal            = "TOP.top.u_vex.cpu.clk";
-    }
-
-    if (retiredPcSignal.empty()){
-        retiredPcSignal         = "TOP.top.u_vex.cpu.lastStagePc";
-    }
-
-    if (retiredPcValidSignal.empty()){
-        retiredPcValidSignal    = "TOP.top.u_vex.cpu.lastStageIsValid";
-    }
-#endif
 
     FstProcess  fstProc(fstFileName);
     cout << fstProc.infoStr();
 
-    FstSignal clkSig(cpuClkSignal);
+    FstSignal clkSig(configParams.cpuClkSignal);
 
-    FstSignal retiredPcSig     (retiredPcSignal);
-    FstSignal retiredPcValidSig(retiredPcValidSignal);
+    FstSignal retiredPcSig     (configParams.retiredPcSignal);
+    FstSignal retiredPcValidSig(configParams.retiredPcValidSignal);
 
-    FstSignal regFileWriteValidSig(regFileWriteValidSignal);
-    FstSignal regFileWriteAddrSig (regFileWriteAddrSignal);
-    FstSignal regFileWriteDataSig (regFileWriteDataSignal);
+    FstSignal regFileWriteValidSig(configParams.regFileWriteValidSignal);
+    FstSignal regFileWriteAddrSig (configParams.regFileWriteAddrSignal);
+    FstSignal regFileWriteDataSig (configParams.regFileWriteDataSignal);
 
-    FstSignal memCmdValidSig   (memCmdValidSignal);
-    FstSignal memCmdReadySig   (memCmdReadySignal);
-    FstSignal memCmdAddrSig    (memCmdAddrSignal);
-    FstSignal memCmdSizeSig    (memCmdSizeSignal);
-    FstSignal memCmdWrSig      (memCmdWrSignal);
-    FstSignal memCmdWrDataSig  (memCmdWrDataSignal);
-    FstSignal memRspValidSig   (memRspValidSignal);
-    FstSignal memRspDataSig    (memRspRdDataSignal);
+    FstSignal memCmdValidSig   (configParams.memCmdValidSignal);
+    FstSignal memCmdReadySig   (configParams.memCmdReadySignal);
+    FstSignal memCmdAddrSig    (configParams.memCmdAddrSignal);
+    FstSignal memCmdSizeSig    (configParams.memCmdSizeSignal);
+    FstSignal memCmdWrSig      (configParams.memCmdWrSignal);
+    FstSignal memCmdWrDataSig  (configParams.memCmdWrDataSignal);
+    FstSignal memRspValidSig   (configParams.memRspValidSignal);
+    FstSignal memRspDataSig    (configParams.memRspRdDataSignal);
 
     CpuTrace        cpuTrace(fstProc, clkSig, retiredPcValidSig, retiredPcSig);
     RegFileTrace    regFileTrace(fstProc, clkSig, regFileWriteValidSig, regFileWriteAddrSig, regFileWriteDataSig);
     MemTrace        memTrace(fstProc, 
-                             memInitFileName, memInitStartAddr,
+                             configParams.memInitFileName, configParams.memInitStartAddr,
                              clkSig, 
                              memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, 
                              memRspValidSig, memRspDataSig);
 
     while(1){
         TcpServer tcpServer(3333);
-        gdb_proc(tcpServer, cpuTrace, regFileTrace, memTrace);
+        dbg_sys_init(tcpServer, cpuTrace, regFileTrace, memTrace);
     }
-
-#if 0
-    unsigned char rxbuf[256];
-    int ret;
-
-    while( (ret = tcpServer.recv(rxbuf, 256)) > 0){
-        cout << "ret:" <<  ret << endl;
-        if (ret > 0){
-            tcpServer.xmit("hhh", 3);
-            tcpServer.xmit(rxbuf, ret);
-        }
-    }
-
-    if (ret == 0){
-        cout << "Connection closed..." << endl;
-    }
-    else{
-        cout << "Connection error: " << ret << endl;
-    }
-#endif
 
     return 0;
 }

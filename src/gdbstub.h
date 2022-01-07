@@ -24,8 +24,8 @@
 #define _GDBSTUB_H_
 
 /* Enable debug statements (printf) */
-#ifndef DEBUG
-#define DEBUG 0
+#ifndef GDBSTUB_DEBUG
+#define GDBSTUB_DEBUG 0
 #endif
 
 /* Include platform specific definitions */
@@ -35,7 +35,7 @@
  * Macros
  ****************************************************************************/
 
-#if DEBUG
+#if GDBSTUB_DEBUG
 #define DEBUG_PRINT(...) fprintf(stderr, __VA_ARGS__)
 #else
 #define DEBUG_PRINT(...)
@@ -50,7 +50,7 @@
 #endif
 
 #ifndef ASSERT
-#if DEBUG
+#if GDBSTUB_DEBUG
 #define ASSERT(x) { \
 	if (!(x)) { \
 		fprintf(stderr, "ASSERTION FAILED\n"); \

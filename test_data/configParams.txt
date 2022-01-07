@@ -1,0 +1,20 @@
+cpuClk             = TOP.top.u_vex.cpu.clk
+
+retiredPc          = TOP.top.u_vex.cpu.lastStagePc
+retiredPcValid     = TOP.top.u_vex.cpu.lastStageIsValid
+
+regFileWriteValid  = TOP.top.u_vex.cpu.lastStageRegFileWrite_valid
+regFileWriteAddr   = TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_address
+regFileWriteData   = TOP.top.u_vex.cpu.lastStageRegFileWrite_payload_data
+
+memCmdValid        = TOP.top.dBus_cmd_valid
+memCmdReady        = TOP.top.dBus_cmd_ready
+memCmdAddr         = TOP.top.dBus_cmd_payload_address
+memCmdSize         = TOP.top.dBus_cmd_payload_size
+memCmdWr           = TOP.top.dBus_cmd_payload_wr
+memCmdWrData       = TOP.top.dBus_cmd_payload_data
+memRspValid        = TOP.top.dBus_rsp_ready
+memRspRdData       = TOP.top.dBus_rsp_data
+
+memInitFile        = "../test_data/progmem.bin"
+memInitStartAddr   = 0

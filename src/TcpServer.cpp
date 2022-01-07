@@ -88,5 +88,28 @@ ssize_t TcpServer::recv(void *buf, size_t buf_size)
     return ret;
 }
 
+#if 0
+void tcpTest()
+{
+    TcpServer tcpServer(3333);
 
+    unsigned char rxbuf[256];
+    int ret;
+
+    while( (ret = tcpServer.recv(rxbuf, 256)) > 0){
+        cout << "ret:" <<  ret << endl;
+        if (ret > 0){
+            tcpServer.xmit("hhh", 3);
+            tcpServer.xmit(rxbuf, ret);
+        }
+    }
+
+    if (ret == 0){
+        cout << "Connection closed..." << endl;
+    }
+    else{
+        cout << "Connection error: " << ret << endl;
+    }
+}
+#endif
 

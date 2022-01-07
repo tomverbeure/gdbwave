@@ -187,6 +187,7 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
 **TODO/Limitations**
 
 * Configure snooping signals with config file
+* Improved error messages for config file
 * Fix 'next' issue 
 * Link with GTKWave
 * Support superscalar CPUs
@@ -194,4 +195,6 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
 * Support complex memory maps
 * Decode register file and memory reads
 * Support for RISC-V instruction tracing decompression
+* No infinite loop after quiting GDB
+* 'R' should work.
 
