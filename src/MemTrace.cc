@@ -134,11 +134,11 @@ void MemTrace::init()
 
     bool allSigsFound = fstProc.assignHandles(sigs);
     if (!allSigsFound){
-        cout << "Not all signals found..." << endl;
+        cerr << "Not all signals found..." << endl;
 
         for(auto sig: sigs){
             if (!sig->hasHandle){
-                printf("Signal not found: %s. %s\n", sig->scopeName.c_str(), sig->name.c_str());
+                fprintf(stderr, "Signal not found: %s.%s\n", sig->scopeName.c_str(), sig->name.c_str());
             }
         }
 
