@@ -119,6 +119,17 @@ bool FstProcess::assignHandles(vector<FstSignal *> &signals)
     return !sigNotFound;
 }
 
+void FstProcess::reportSignalsNotFound(vector<FstSignal *> &signals)
+{
+    cerr << "Not all signals found..." << endl;
+
+    for(auto sig: signals){
+        if (!sig->hasHandle){
+            fprintf(stderr, "Signal not found: %s.%s\n", sig->scopeName.c_str(), sig->name.c_str());
+        }
+    }
+}
+
 void FstProcess::fst_callback2(void *user_callback_data_pointer, uint64_t time, fstHandle sigHandle, const unsigned char *value, uint32_t len)
 {
     throw runtime_error("callback2 not supported.");

@@ -59,6 +59,7 @@ public:
     string infoStr(void);
 
     bool assignHandles(vector<FstSignal *> &signals);
+    void reportSignalsNotFound(vector<FstSignal *> &signals);
     void getValueChanges(vector<FstSignal *> signals, void (*valueChangedCB)(uint64_t time, FstSignal *signal, const unsigned char *value, void *userInfo), void *userInfo);
 
     struct FstCallbackInfo {

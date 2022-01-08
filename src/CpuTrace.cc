@@ -53,14 +53,7 @@ void CpuTrace::init()
 
     bool allSigsFound = fstProc.assignHandles(sigs);
     if (!allSigsFound){
-        cerr << "Not all signals found in waveform file." << endl;
-
-        for(auto sig: sigs){
-            if (!sig->hasHandle){
-                fprintf(stderr, "Signal not found: %s.%s\n", sig->scopeName.c_str(), sig->name.c_str());
-            }
-        }
-
+        fstProc.reportSignalsNotFound(sigs);
         exit(-1);
     }
 
