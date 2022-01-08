@@ -4,7 +4,14 @@ INC_FILES   = FstProcess.h CpuTrace.h
 OBJ_FILES   = main.o FstProcess.o CpuTrace.o RegFileTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o 
 LIB_FILES   = -lfstapi -lz
 
-RISCV_TOOLCHAIN = /opt/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
+UNAME_S         = $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    RISCV_TOOLCHAIN = /opt/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
+endif
+ifeq ($(UNAME_S),Darwin)
+    RISCV_TOOLCHAIN = /opt/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-apple-darwin/bin
+endif
+
 RISCV_PREFIX    = riscv64-unknown-elf-
 
 GDB             = $(RISCV_TOOLCHAIN)/$(RISCV_PREFIX)gdb

@@ -37,10 +37,10 @@ void TcpServer::open(int port)
         throw runtime_error("Socket creation failed.");
     }
 
-#if 1
+#if !defined(__APPLE__)
     // Both SO_REUSEADDR and SO_REUSEPORT are required to allow the TCP server to restart again immediately
     // after closing it, but one way or the other, that doesn't work on macOS...
-    int                 sock_opt = 1;
+    int sock_opt = 1;
     int setsockopt_rc = ::setsockopt(
         server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT,     // fails on macOS
         &sock_opt, sizeof(sock_opt)
@@ -78,7 +78,11 @@ void TcpServer::open(int port)
 
 ssize_t TcpServer::xmit(const void *buf, size_t len)
 {
+#if !defined(__APPLE__)
     ssize_t ret = ::send(socket_fd, buf, len, MSG_NOSIGNAL);
+#else
+    ssize_t ret = ::send(socket_fd, buf, len, 0);
+#endif
     return ret;
 }
 
