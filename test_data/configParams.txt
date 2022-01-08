@@ -16,5 +16,5 @@ memCmdWrData       = TOP.top.dBus_cmd_payload_data
 memRspValid        = TOP.top.dBus_rsp_ready
 memRspRdData       = TOP.top.dBus_rsp_data
 
-memInitFile        = "../test_data/progmem.bin"
+memInitFile        = ../test_data/progmem.bin
 memInitStartAddr   = 0

@@ -17,7 +17,7 @@ struct MemAccess
 class MemTrace
 {
 public:
-    MemTrace(FstProcess & fstProc, string memInitFilename, int memInitStartAddr,  
+    MemTrace(FstProcess & fstProc, string memInitFileName, int memInitStartAddr,  
                 FstSignal clk, 
                 FstSignal memCmdValid, FstSignal memCmdReady, FstSignal memCmdAddr, FstSignal memCmdSize, FstSignal memCmdWr, FstSignal memCmdWrData,
                 FstSignal memRspValid, FstSignal memRspData);
@@ -30,7 +30,7 @@ public:
     FstProcess &    fstProc;
 
     // Memory initialization values at bootup
-    string              memInitFilename;
+    string              memInitFileName;
     unsigned int        memInitStartAddr;
     std::vector<char>   memInitContents;
 

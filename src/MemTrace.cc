@@ -9,12 +9,12 @@ using namespace std;
 
 #include "MemTrace.h"
 
-MemTrace::MemTrace(FstProcess & fstProc, string memInitFilename, int memInitStartAddr,  
+MemTrace::MemTrace(FstProcess & fstProc, string memInitFileName, int memInitStartAddr,  
                 FstSignal clk, 
                 FstSignal memCmdValid, FstSignal memCmdReady, FstSignal memCmdAddr, FstSignal memCmdSize, FstSignal memCmdWr, FstSignal memCmdWrData,
                 FstSignal memRspValid, FstSignal memRspData) :
     fstProc(fstProc), 
-    memInitFilename(memInitFilename),
+    memInitFileName(memInitFileName),
     memInitStartAddr(memInitStartAddr),
     clk(clk),
     memCmdValid(memCmdValid),
@@ -110,9 +110,13 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
 
 void MemTrace::init()
 {
-    if (!memInitFilename.empty()){
-        printf("Loading mem init file: %s\n", memInitFilename.c_str());
-        ifstream initFile(memInitFilename, ios::in | ios::binary);
+    if (!memInitFileName.empty()){
+        printf("Loading mem init file: %s\n", memInitFileName.c_str());
+        ifstream initFile(memInitFileName, ios::in | ios::binary);
+        if (initFile.fail()){
+            cerr << "Error opening mem init file: " << memInitFileName << " (" << strerror(errno) << ")" << endl;
+            exit(1);
+        }
         memInitContents = vector<char>((std::istreambuf_iterator<char>(initFile)), std::istreambuf_iterator<char>());
     }
 

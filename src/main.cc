@@ -70,6 +70,7 @@ void help()
 void parseConfig(ifstream & configFile, ConfigParams &c)
 {
     string line;
+    cout << "Reading configuration parameters..." << endl;
 
     while(getline(configFile, line)){
         line.erase(remove_if(line.begin(), line.end(), ::isspace), line.end());
@@ -117,7 +118,12 @@ void parseConfig(ifstream & configFile, ConfigParams &c)
         else if (name == "memInitStartAddr")
             c.memInitStartAddr              = stoi(value);
 
-        cout << name << " " << value << endl;
+        else{
+            cerr << "Unknown configuration parameter: " << name << endl;
+            exit(1);
+        }
+
+        cout << name << ":" << value << endl;
     }
 }
 
