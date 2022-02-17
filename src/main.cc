@@ -55,11 +55,30 @@ string get_local_name(string full_path)
     return full_path.substr(last_dot+1);
 }
 
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+}
+
 void help()
 {
     fprintf(stderr, "Usage: gdbwave <options>\n");
     fprintf(stderr, "    -w <FST waveform file>\n");
-    fprintf(stderr, "    -b <memory contents binary file>\n");
     fprintf(stderr, "    -c <config parameter file>\n");
     fprintf(stderr, "    -v verbose\n");
     fprintf(stderr, "\n");
@@ -73,15 +92,15 @@ void parseConfig(ifstream & configFile, ConfigParams &c)
     cout << "Reading configuration parameters..." << endl;
 
     while(getline(configFile, line)){
-        line.erase(remove_if(line.begin(), line.end(), ::isspace), line.end());
+        trim(line);
         if (line[0] == '#' || line.empty())
             continue;
         auto delimiterPos   = line.find("=");
         auto name           = line.substr(0, delimiterPos);
         auto value          = line.substr(delimiterPos+1);
 
-        name.erase(remove_if(name.begin(), name.end(), ::isspace), name.end());
-        value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
+        trim(name);
+        trim(value);
 
         if (name == "cpuClk")
             c.cpuClkSignal                  = value;

@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <string>
+#include <stdio.h>
 
 using namespace std;
 
@@ -18,6 +19,10 @@ CpuTrace::CpuTrace(FstProcess & fstProc, FstSignal clk, FstSignal pcValid, FstSi
 static void pcChangedCB(uint64_t time, FstSignal *signal, const unsigned char *value, void *userInfo)
 {
     CpuTrace *cpuTrace = (CpuTrace *)userInfo;
+
+    if (strstr((char *)value, "x") || strstr((char *)value, "z")){
+        return;
+    }
 
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
     //cout << time << "," << signal->handle << "," << signal->name << "," << value << "," << valueInt << endl;

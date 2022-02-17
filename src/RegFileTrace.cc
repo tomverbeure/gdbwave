@@ -22,6 +22,9 @@ static void memChangedCB(uint64_t time, FstSignal *signal, const unsigned char *
 {
     RegFileTrace *regFileTrace = (RegFileTrace *)userInfo;
 
+    if (strstr((char *)value, "x") || strstr((char *)value, "z")){
+        return;
+    }
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
     //cout << time << "," << signal->handle << "," << signal->name << "," << value << "," << valueInt << endl;
 
