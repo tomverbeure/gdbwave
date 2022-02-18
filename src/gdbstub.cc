@@ -601,8 +601,7 @@ int dbg_mem_write(const char *buf, size_t buf_len, address addr, size_t len, dbg
  */
 int dbg_continue(void)
 {
-	dbg_sys_continue();
-	return 0;
+	return dbg_sys_continue();
 }
 
 /*
@@ -610,8 +609,7 @@ int dbg_continue(void)
  */
 int dbg_step(void)
 {
-	dbg_sys_step();
-	return 0;
+	return dbg_sys_step();
 }
 
 /*****************************************************************************
@@ -623,6 +621,8 @@ int dbg_step(void)
  */
 int dbg_send_ok_packet(char *buf, size_t buf_len)
 {
+        LOG_INFO("Resp: OK");
+
 	return dbg_send_packet("OK", 2);
 }
 
@@ -631,6 +631,8 @@ int dbg_send_ok_packet(char *buf, size_t buf_len)
  */
 int dbg_send_conmsg_packet(char *buf, size_t buf_len, const char *msg)
 {
+        LOG_INFO("Resp: conmsg %s", msg);
+
 	size_t size;
 	int status;
 
@@ -653,6 +655,8 @@ int dbg_send_conmsg_packet(char *buf, size_t buf_len, const char *msg)
  */
 int dbg_send_signal_packet(char *buf, size_t buf_len, char signal)
 {
+        LOG_INFO("Resp: signal %d", signal);
+
 	size_t size;
 	int status;
 
@@ -671,10 +675,36 @@ int dbg_send_signal_packet(char *buf, size_t buf_len, char signal)
 }
 
 /*
+ * Send a terminated packet (S AA).
+ */
+int dbg_send_terminated_packet(char *buf, size_t buf_len, char signal)
+{
+        LOG_INFO("Resp: terminated %d", signal);
+
+	size_t size;
+	int status;
+
+	if (buf_len < 4) {
+		/* Buffer too small */
+		return EOF;
+	}
+
+	buf[0] = 'W';
+	status = dbg_enc_hex(&buf[1], buf_len-1, &signal, 1);
+	if (status == EOF) {
+		return EOF;
+	}
+	size = 1 + status;
+	return dbg_send_packet(buf, size);
+}
+
+/*
  * Send a error packet (E AA).
  */
 int dbg_send_error_packet(char *buf, size_t buf_len, char error)
 {
+        LOG_INFO("Resp: error %d", error);
+
 	size_t size;
 	int status;
 
@@ -758,7 +788,7 @@ int dbg_main(struct dbg_state *state)
 
         int ret;
 
-        LOG_INFO("Signal %d", state->signum);
+        LOG_INFO("Send signal %d", state->signum);
 	ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
         if (ret == EOF){
             return -1;
@@ -815,6 +845,7 @@ int dbg_main(struct dbg_state *state)
                 /* Restart */
                 case 'R':
                         LOG_INFO("CMD - R: restart");
+                        LOG_INFO("    No reply");
 
                         dbg_sys_restart();
                         break;
@@ -1052,7 +1083,15 @@ int dbg_main(struct dbg_state *state)
 		case 'c':
 			LOG_INFO("CMD - c : continue");
 
-			dbg_continue();
+			ret = dbg_continue();
+                        if (ret == -1){
+                            // Reached last instruction. Send back Terminated
+			    ret = dbg_send_terminated_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+                            if (ret == EOF){
+                                return -1;
+                            }
+                            break;
+                        }
                         return 0;
 
 		/*
@@ -1062,11 +1101,25 @@ int dbg_main(struct dbg_state *state)
 		case 's':
 			LOG_INFO("CMD - s : step");
 
-			dbg_step();
+			ret = dbg_step();
+
+                        if (ret == -1){
+                            // Reached last instruction. Send back Terminated
+			    ret = dbg_send_terminated_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+                            if (ret == EOF){
+                                return -1;
+                            }
+                            break;
+                        }
                         return 0;
 
+		case 'k':
+			LOG_INFO("CMD - k : kill/restart");
+                        LOG_INFO("    No reply");
+                        break;
+
 		case '?':
-			LOG_INFO("CMD - ? : get signal");
+			LOG_INFO("CMD - ? : query reason halted");
 
 			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
                         if (ret == EOF){
@@ -1075,10 +1128,25 @@ int dbg_main(struct dbg_state *state)
 			break;
 
                 case '!':
+			LOG_INFO("CMD - ! : enable extended mode");
+
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return -1;
+                        }
+                        break;
+
                 case 'T':
+			LOG_INFO("CMD - T : is thread alive?");
+
+			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
+                        if (ret == EOF){
+                            return -1;
+                        }
+                        break;
+
                 case 'H':
-			LOG_INFO("CMD - %c", pkt_buf[0]);
-                        LOG_INFO("    Just reply OK");
+			LOG_INFO("CMD - H : set thread");
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
@@ -1091,6 +1159,7 @@ int dbg_main(struct dbg_state *state)
 		 */
 		default:
 			LOG_INFO("CMD - Unsupported command: %c", pkt_buf[0]);
+                        LOG_INFO("Resp: null");
 
 			ret = dbg_send_packet((const char *)NULL, 0);
                         if (ret == EOF){

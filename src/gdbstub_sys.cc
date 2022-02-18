@@ -138,10 +138,8 @@ int dbg_sys_step(void)
         LOG_INFO("Reached end of execution!!!");
         cpuTrace->pcTraceIt = cpuTrace->pcTrace.end()-1;
 
-        // FIXME: need to figure out the right signal
-        dbg_state.signum    = 0x06;         // SIGABRT
-        dbg_state.signum    = 0x09;         // SIGKILL
-        dbg_state.signum    = 0x13;         // SIGSTOP
+        // -1 will ultimately result in a terminate message.
+        return -1;
     }
     else{
         dbg_state.signum    = 0x05;         // SIGTRAP
