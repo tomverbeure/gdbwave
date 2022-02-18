@@ -141,6 +141,7 @@ int dbg_sys_step(void)
         // FIXME: need to figure out the right signal
         dbg_state.signum    = 0x06;         // SIGABRT
         dbg_state.signum    = 0x09;         // SIGKILL
+        dbg_state.signum    = 0x13;         // SIGSTOP
     }
     else{
         dbg_state.signum    = 0x05;         // SIGTRAP
