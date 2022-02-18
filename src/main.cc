@@ -241,10 +241,8 @@ int main(int argc, char **argv)
                              memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, 
                              memRspValidSig, memRspDataSig);
 
-    while(1){
-        TcpServer tcpServer(3333);
-        dbg_sys_init(tcpServer, cpuTrace, regFileTrace, memTrace);
-    }
+    TcpServer tcpServer(3333);
+    dbg_sys_init(tcpServer, cpuTrace, regFileTrace, memTrace);
 
     return 0;
 }

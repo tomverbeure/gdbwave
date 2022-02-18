@@ -331,6 +331,9 @@ int dbg_recv_packet(char *pkt_buf, size_t pkt_buf_len, size_t *pkt_len)
 
 	while (1) {
 		data = dbg_sys_getc();
+                if (data == EOF){
+                        return EOF;
+                }
 		if (data == '$') {
 			/* Detected start of packet. */
 			break;
@@ -758,7 +761,7 @@ int dbg_main(struct dbg_state *state)
         LOG_INFO("Signal %d", state->signum);
 	ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
         if (ret == EOF){
-            return 0;
+            return -1;
         }
 
 	while (1) {
@@ -839,7 +842,7 @@ int dbg_main(struct dbg_state *state)
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 
                         break;
@@ -864,7 +867,7 @@ int dbg_main(struct dbg_state *state)
 			pkt_len = status;
 			ret = dbg_send_packet(pkt_buf, pkt_len);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 			break;
 		
@@ -883,7 +886,7 @@ int dbg_main(struct dbg_state *state)
 			}
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 			break;
 #endif
@@ -911,7 +914,7 @@ int dbg_main(struct dbg_state *state)
 			}
 			ret = dbg_send_packet(pkt_buf, status);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 			break;
 		
@@ -937,7 +940,7 @@ int dbg_main(struct dbg_state *state)
 			}
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 			break;
 #endif
@@ -958,7 +961,7 @@ int dbg_main(struct dbg_state *state)
                         // Return E01 when unable to read memory
 		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 #else
 			/* Read Memory */
@@ -969,7 +972,7 @@ int dbg_main(struct dbg_state *state)
 			}
 			ret = dbg_send_packet(pkt_buf, status);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 #endif
 
@@ -991,7 +994,7 @@ int dbg_main(struct dbg_state *state)
                         // Return E01 when unable to read memory
 		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 
 #if 0
@@ -1003,7 +1006,7 @@ int dbg_main(struct dbg_state *state)
 			}
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 #endif
 			break;
@@ -1024,7 +1027,7 @@ int dbg_main(struct dbg_state *state)
                         // Return E01 when unable to read memory
 		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 
 #if 0
@@ -1036,7 +1039,7 @@ int dbg_main(struct dbg_state *state)
 			}
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 #endif
 
@@ -1067,7 +1070,7 @@ int dbg_main(struct dbg_state *state)
 
 			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 			break;
 
@@ -1079,7 +1082,7 @@ int dbg_main(struct dbg_state *state)
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
                         break;
 
@@ -1091,7 +1094,7 @@ int dbg_main(struct dbg_state *state)
 
 			ret = dbg_send_packet((const char *)NULL, 0);
                         if (ret == EOF){
-                            return 0;
+                            return -1;
                         }
 		}
 
@@ -1101,7 +1104,7 @@ int dbg_main(struct dbg_state *state)
 		LOG_INFO("Sending error packet...");
 		ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x00);
                 if (ret == EOF){
-                    return 0;
+                    return -1;
                 }
 
 		#undef token_remaining_buf

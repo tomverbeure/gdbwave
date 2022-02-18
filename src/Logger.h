@@ -45,7 +45,7 @@ class Logger
             logFile.open(fn);
         }
         void out(DebugLevel l, std::string s, bool prefix = true, bool ret = true) {
-            if (l >= debugLevel){
+            if (l <= debugLevel){
                 std::string p_str = "";
                 if (prefix){
                     switch(l){

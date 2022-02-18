@@ -32,9 +32,12 @@ void dbg_sys_init(TcpServer &tS, CpuTrace &cT, RegFileTrace &rT, MemTrace &mT)
 
     dbg_sys_update_state();
 
-    while(1){
-        dbg_main(&dbg_state);
-    }
+    int ret;
+    do{
+        ret = dbg_main(&dbg_state);
+    } while(ret == 0);
+
+    LOG_ERROR("GDB client disconnected.");
 }
 
 void dbg_sys_update_state()
@@ -130,14 +133,21 @@ int dbg_sys_step(void)
     if (cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
         ++cpuTrace->pcTraceIt;
     }
-    else{
+
+    if (cpuTrace->pcTraceIt == cpuTrace->pcTrace.end()){
         LOG_INFO("Reached end of execution!!!");
         cpuTrace->pcTraceIt = cpuTrace->pcTrace.end()-1;
+
+        // FIXME: need to figure out the right signal
+        dbg_state.signum    = 0x06;         // SIGABRT
+        dbg_state.signum    = 0x09;         // SIGKILL
+    }
+    else{
+        dbg_state.signum    = 0x05;         // SIGTRAP
     }
 
     LOG_INFO("dbg_sys_step: PC = 0x%08lx (time: %ld, %ld out of %ld)", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
 
-    dbg_state.signum    = 0x05;         // SIGTRAP
     dbg_sys_update_state();
 
     return 0;
