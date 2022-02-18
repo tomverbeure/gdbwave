@@ -7,6 +7,7 @@
 
 #include <fst/fstapi.h>
 
+#include "Logger.h"
 #include "CpuTrace.h"
 #include "MemTrace.h"
 #include "RegFileTrace.h"
@@ -14,7 +15,7 @@
 #include "TcpServer.h"
 #include "gdbstub.h"
 
-#define DEBUG   1
+#define DEVELOP   1
 
 using namespace std;
 
@@ -77,19 +78,19 @@ static inline void trim(std::string &s) {
 
 void help()
 {
-    fprintf(stderr, "Usage: gdbwave <options>\n");
-    fprintf(stderr, "    -w <FST waveform file>\n");
-    fprintf(stderr, "    -c <config parameter file>\n");
-    fprintf(stderr, "    -v verbose\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "Example: ./gdbwave -w ./test_data/top.fst -c ./test_data/configParams.txt\n");
-    fprintf(stderr, "\n");
+    LOG_INFO("Usage: gdbwave <options>");
+    LOG_INFO("    -w <FST waveform file>");
+    LOG_INFO("    -c <config parameter file>");
+    LOG_INFO("    -v verbose");
+    LOG_INFO("");
+    LOG_INFO("Example: ./gdbwave -w ./test_data/top.fst -c ./test_data/configParams.txt");
+    LOG_INFO("");
 }
 
 void parseConfig(ifstream & configFile, ConfigParams &c)
 {
     string line;
-    cout << "Reading configuration parameters..." << endl;
+    LOG_INFO("Reading configuration parameters...");
 
     while(getline(configFile, line)){
         trim(line);
@@ -138,20 +139,21 @@ void parseConfig(ifstream & configFile, ConfigParams &c)
             c.memInitStartAddr              = stoi(value);
 
         else{
-            cerr << "Unknown configuration parameter: " << name << endl;
+            LOG_ERROR("Unknown configuration parameter: %s", name.c_str());
             exit(1);
         }
 
-        cout << name << ":" << value << endl;
+        LOG_INFO("name:%s", value.c_str());
     }
 }
 
 int main(int argc, char **argv)
 {
     int c;
+    Logger::log().setDebugLevel(Logger::INFO);
+    Logger::log().setLogFile("./gdbwave.log");
 
     ConfigParams configParams;
-
 
     string fstFileName; 
     string configParamsFileName;
@@ -160,6 +162,7 @@ int main(int argc, char **argv)
         switch(c){
             case 'h':
                 help();
+                exit(0);
                 break;
             case 'w': 
                 fstFileName = optarg;
@@ -172,7 +175,7 @@ int main(int argc, char **argv)
         }
     }
 
-#if DEBUG==1
+#if DEVELOP==1
     if (fstFileName.empty()){
         fstFileName             = "../test_data/top.fst";
     }
@@ -181,12 +184,12 @@ int main(int argc, char **argv)
     }
 #else
     if (fstFileName.empty()){
-        fprintf(stderr, "FST waveform file not specified!\n\n");
+        LOG_ERROR("FST waveform file not specified!");
         return 1;
     }
 
     if (configParamsFileName.empty()){
-        fprintf(stderr, "Configuration parameter file not specified!\n\n");
+        LOG_ERROR(stderr, "Configuration parameter file not specified!");
         return 1;
     }
 #endif
@@ -195,22 +198,22 @@ int main(int argc, char **argv)
     parseConfig(configFile, configParams);
 
     if (configParams.cpuClkSignal.empty()){
-        fprintf(stderr, "CPU clock signal not specified!\n\n");
+        LOG_ERROR("CPU clock signal not specified!");
         return 1;
     }
 
     if (configParams.retiredPcSignal.empty()){
-        fprintf(stderr, "CPU program counter signal not specified!\n\n");
+        LOG_ERROR("CPU program counter signal not specified!");
         return 1;
     }
 
     if (configParams.retiredPcValidSignal.empty()){
-        fprintf(stderr, "CPU program counter valid signal not specified!\n\n");
+        LOG_ERROR("CPU program counter valid signal not specified!");
         return 1;
     }
 
     FstProcess  fstProc(fstFileName);
-    cout << fstProc.infoStr();
+    LOG_INFO("%s", fstProc.infoStr().c_str());
 
     FstSignal clkSig(configParams.cpuClkSignal);
 

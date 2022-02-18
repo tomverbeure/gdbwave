@@ -7,6 +7,7 @@
 using namespace std;
 
 #include "RegFileTrace.h"
+#include "Logger.h"
 
 RegFileTrace::RegFileTrace(FstProcess & fstProc, FstSignal clk, FstSignal memWr, FstSignal memAddr, FstSignal memWrData) :
     fstProc(fstProc), 
@@ -26,7 +27,7 @@ static void memChangedCB(uint64_t time, FstSignal *signal, const unsigned char *
         return;
     }
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
-    //cout << time << "," << signal->handle << "," << signal->name << "," << value << "," << valueInt << endl;
+    LOG_DEBUG("%ld, %ud, %s, %s, %ld", time, signal->handle, signal->name.c_str(), value, valueInt);
 
     if (signal->handle == regFileTrace->memWr.handle){
         regFileTrace->curMemWr      = valueInt;
@@ -46,7 +47,7 @@ static void memChangedCB(uint64_t time, FstSignal *signal, const unsigned char *
     // All signals changes on the rising edge of the clock. Everything is stable at the falling edge...
     if (signal->handle == regFileTrace->clk.handle && valueInt == 0){
         if (regFileTrace->curMemWr){
-            printf("RegWr: 0x%08lx <- 0x%08lx (@%ld)\n", regFileTrace->curMemAddr, regFileTrace->curMemWrData, time);
+            LOG_INFO("RegWr: 0x%08lx <- 0x%08lx (@%ld)", regFileTrace->curMemAddr, regFileTrace->curMemWrData, time);
 
             RegFileAccess   mem = { time, regFileTrace->curMemWr, regFileTrace->curMemAddr, regFileTrace->curMemWrData };
             regFileTrace->regFileTrace.push_back(mem);
@@ -75,7 +76,7 @@ void RegFileTrace::init()
 
     fstProc.getValueChanges(sigs, memChangedCB, (void *)this);
 
-    printf("Nr mem transactions: %ld\n", regFileTrace.size());
+    LOG_INFO("Nr mem transactions: %ld", regFileTrace.size());
 }
 
 

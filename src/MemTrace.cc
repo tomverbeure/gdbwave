@@ -8,6 +8,7 @@
 using namespace std;
 
 #include "MemTrace.h"
+#include "Logger.h"
 
 MemTrace::MemTrace(FstProcess & fstProc, string memInitFileName, int memInitStartAddr,  
                 FstSignal clk, 
@@ -40,8 +41,9 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
     if (strstr((char *)value, "x") || strstr((char *)value, "z")){
         return;
     }
+
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
-    //cout << time << "," << signal->handle << "," << signal->name << "," << value << "," << valueInt << endl;
+    LOG_DEBUG("%ld, %ud, %s, %s, %ld", time, signal->handle, signal->name.c_str(), value, valueInt);
 
     if (signal->handle == memCmdValid.handle){
         curMemCmdValid      = valueInt;
@@ -100,7 +102,7 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
                         uint64_t byteVal    = (curMemCmdWrData >> (byteNr * 8)) & 255;
                         uint64_t addr       = (curMemCmdAddr & ~3) | byteNr;
 
-                        printf("MemWr: 0x%08lx <- 0x%02lx (@%ld)\n", addr, byteVal, time);
+                        LOG_INFO("MemWr: 0x%08lx <- 0x%02lx (@%ld)", addr, byteVal, time);
 
                         MemAccess   ma = { time, curMemCmdWr, addr, byteVal }; 
                         memTrace.push_back(ma);
@@ -114,10 +116,10 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
 void MemTrace::init()
 {
     if (!memInitFileName.empty()){
-        printf("Loading mem init file: %s\n", memInitFileName.c_str());
+        LOG_INFO("Loading mem init file: %s", memInitFileName.c_str());
         ifstream initFile(memInitFileName, ios::in | ios::binary);
         if (initFile.fail()){
-            cerr << "Error opening mem init file: " << memInitFileName << " (" << strerror(errno) << ")" << endl;
+            LOG_ERROR("Error opening mem init file: %s (%s)", memInitFileName.c_str(), strerror(errno));
             exit(1);
         }
         memInitContents = vector<char>((std::istreambuf_iterator<char>(initFile)), std::istreambuf_iterator<char>());
@@ -152,7 +154,7 @@ void MemTrace::init()
 
     fstProc.getValueChanges(sigs, memChangedCB, (void *)this);
 
-    printf("Nr mem transactions: %ld\n", memTrace.size());
+    LOG_INFO("Nr mem transactions: %ld", memTrace.size());
 }
 
 

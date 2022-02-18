@@ -1,7 +1,7 @@
 
 
-INC_FILES   = FstProcess.h CpuTrace.h
-OBJ_FILES   = main.o FstProcess.o CpuTrace.o RegFileTrace.o MemTrace.o TcpServer.o gdbstub.o gdbstub_sys.o 
+INC_FILES   = FstProcess.h CpuTrace.h RegFileTrace.h MemTrace.h TcpServer.h Logger.h
+OBJ_FILES   = main.o FstProcess.o CpuTrace.o RegFileTrace.o MemTrace.o TcpServer.o Logger.o gdbstub.o gdbstub_sys.o
 LIB_FILES   = -lfstapi -lz
 
 UNAME_S         = $(shell uname -s)
@@ -14,9 +14,9 @@ endif
 
 RISCV_PREFIX    = riscv64-unknown-elf-
 
-GDB             = $(RISCV_TOOLCHAIN)/$(RISCV_PREFIX)gdb
+RISCV_GDB       = $(RISCV_TOOLCHAIN)/$(RISCV_PREFIX)gdb
 
-CXXFLAGS    += --std=c++14 -I. -Wall -pedantic -g -O0
+CXXFLAGS    += --std=c++14 -I. -Wall -pedantic -g -O0 -Wno-format-zero-length
 LDFLAGS     += -L./fst -Wall -g 
 
 TEST_FST        = ../test_data/top.fst
@@ -36,7 +36,7 @@ fst/libfstapi.a:
 $(OBJ_FILES): $(INC_FILES)
 
 gdb: 
-	$(GDB) ../test_data/progmem.elf -x ./gdb_conf.cmd
+	$(RISCV_GDB) ../test_data/progmem.elf -x ./gdb_conf.cmd
 
 wave:
 	gtkwave ../test_data/top.fst ../test_data/waves.gtkw

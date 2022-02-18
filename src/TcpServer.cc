@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "TcpServer.h"
+#include "Logger.h"
 
 using namespace std;
 
@@ -61,7 +62,7 @@ void TcpServer::open(int port)
         throw runtime_error("bind failed.");
     }
 
-    cout << "Waiting for connection on port " << this->port << "..." << endl;
+    LOG_INFO("Waiting for connection on port %d...", this->port);
     if (::listen(server_fd, 3) < 0) {
         perror("listen failed");
         throw runtime_error("listen failed.");
@@ -73,7 +74,7 @@ void TcpServer::open(int port)
         throw runtime_error("accept failed.");
     }
 
-    cout << "Connected!" << endl;
+    LOG_INFO("Connected!");
 }
 
 ssize_t TcpServer::xmit(const void *buf, size_t len)

@@ -6,6 +6,7 @@
 using namespace std;
 
 #include "CpuTrace.h"
+#include "Logger.h"
 
 CpuTrace::CpuTrace(FstProcess & fstProc, FstSignal clk, FstSignal pcValid, FstSignal pc) :
     fstProc(fstProc), 
@@ -25,7 +26,7 @@ static void pcChangedCB(uint64_t time, FstSignal *signal, const unsigned char *v
     }
 
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
-    //cout << time << "," << signal->handle << "," << signal->name << "," << value << "," << valueInt << endl;
+    LOG_DEBUG("%ld, %ud, %s, %s, %ld", time, signal->handle, signal->name.c_str(), value, valueInt);
 
     if (signal->handle == cpuTrace->pcValid.handle){
         cpuTrace->curPcValidVal   = valueInt;
@@ -40,7 +41,7 @@ static void pcChangedCB(uint64_t time, FstSignal *signal, const unsigned char *v
     // All signals changes on the rising edge of the clock. Everything is stable at the falling edge...
     if (signal->handle == cpuTrace->clk.handle && valueInt == 0){
         if (cpuTrace->curPcValidVal){
-            cout << "instr retire: " << time << "," << std::hex << cpuTrace->curPcVal << std::dec << endl;
+            LOG_INFO("instr retire: %ld, %08lx", time, cpuTrace->curPcVal);
 
             PcValue     pc = { time, cpuTrace->curPcVal };
             cpuTrace->pcTrace.push_back(pc);
@@ -64,7 +65,7 @@ void CpuTrace::init()
 
 #if 0
     for(auto sig: sigs){
-        cout << sig->name << "," << sig->handle << endl;
+        LOG_DEBUG(sig->name + "," + std::to_string(sig->handle);
     }
 #endif
 
@@ -73,6 +74,6 @@ void CpuTrace::init()
 
     fstProc.getValueChanges(sigs, pcChangedCB, (void *)this);
 
-    printf("Nr CPU instructions: %ld\n", pcTrace.size());
+    LOG_INFO("Nr CPU instructions: %ld", pcTrace.size());
 }
 

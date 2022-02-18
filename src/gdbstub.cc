@@ -25,6 +25,7 @@
 using namespace std;
 
 #include "gdbstub.h"
+#include "Logger.h"
 
 /*****************************************************************************
  * Types
@@ -238,7 +239,7 @@ int dbg_recv_ack(void)
 		return 1;
 	default:
 		/* Bad response! */
-		DEBUG_PRINT("received bad packet response: 0x%2x\n", response);
+		LOG_DEBUG("received bad packet response: 0x%2x", response);
 		return EOF;
 	}
 }
@@ -284,15 +285,15 @@ int dbg_send_packet(const char *pkt_data, size_t pkt_len)
 #if DEBUG
 	{
 		size_t p;
-		DEBUG_PRINT("-> ");
+		LOG_DEBUG("-> ");
 		for (p = 0; p < pkt_len; p++) {
 			if (dbg_is_printable_char(pkt_data[p])) {
-				DEBUG_PRINT("%c", pkt_data[p]);
+				LOG_DEBUG("%c", pkt_data[p]);
 			} else {
-				DEBUG_PRINT("\\x%02x", pkt_data[p]&0xff);
+				LOG_DEBUG("\\x%02x", pkt_data[p]&0xff);
 			}
 		}
-		DEBUG_PRINT("\n");
+		LOG_DEBUG("");
 	}
 #endif
 
@@ -350,7 +351,7 @@ int dbg_recv_packet(char *pkt_buf, size_t pkt_buf_len, size_t *pkt_len)
 		} else {
 			/* Check for space */
 			if (*pkt_len >= pkt_buf_len) {
-				DEBUG_PRINT("packet buffer overflow\n");
+				LOG_DEBUG("packet buffer overflow");
 				return EOF;
 			}
 
@@ -362,15 +363,15 @@ int dbg_recv_packet(char *pkt_buf, size_t pkt_buf_len, size_t *pkt_len)
 #if DEBUG
 	{
 		size_t p;
-		DEBUG_PRINT("<- ");
+		LOG_DEBUG("<- ");
 		for (p = 0; p < *pkt_len; p++) {
 			if (dbg_is_printable_char(pkt_buf[p])) {
-				DEBUG_PRINT("%c", pkt_buf[p]);
+				LOG_DEBUG("%c", pkt_buf[p]);
 			} else {
-				DEBUG_PRINT("\\x%02x", pkt_buf[p] & 0xff);
+				LOG_DEBUG("\\x%02x", pkt_buf[p] & 0xff);
 			}
 		}
-		DEBUG_PRINT("\n");
+		LOG_DEBUG("");
 	}
 #endif
 
@@ -384,7 +385,7 @@ int dbg_recv_packet(char *pkt_buf, size_t pkt_buf_len, size_t *pkt_len)
 	actual_csum = dbg_checksum(pkt_buf, *pkt_len);
 	if (actual_csum != expected_csum) {
 		/* Send packet nack */
-		DEBUG_PRINT("received packet with bad checksum\n");
+		LOG_DEBUG("received packet with bad checksum");
 		dbg_sys_putchar('-');
 		return EOF;
 	}
@@ -754,7 +755,7 @@ int dbg_main(struct dbg_state *state)
 
         int ret;
 
-        printf("Signal %d\n", state->signum);
+        LOG_INFO("Signal %d", state->signum);
 	ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
         if (ret == EOF){
             return 0;
@@ -772,11 +773,11 @@ int dbg_main(struct dbg_state *state)
 			continue;
 		}
 
-                printf("\nReceived command:");
+                Logger::log().out(Logger::DebugLevel::INFO, "Received command:", true, false);
                 for(size_t c=0;c<pkt_len;++c){
-                    printf("%c",pkt_buf[c]);
+                    string ch(1, pkt_buf[c]);
+                    Logger::log().out(Logger::DebugLevel::INFO, ch, false, c==pkt_len-1);
                 }
-                printf("\n");
 
 		ptr_next = pkt_buf;
 
@@ -810,7 +811,7 @@ int dbg_main(struct dbg_state *state)
 
                 /* Restart */
                 case 'R':
-                        printf("R: restart\n");
+                        LOG_INFO("CMD - R: restart");
 
                         dbg_sys_restart();
                         break;
@@ -827,7 +828,7 @@ int dbg_main(struct dbg_state *state)
 			token_expect_seperator(',');
 			token_expect_integer_arg(kind);
 
-                        printf("Z: is_hw:%d, addr: 0x%08x, kind: %d\n", is_hw, addr, kind);
+                        LOG_INFO("CMD - Z: is_hw:%d, addr: 0x%08x, kind: %d", is_hw, addr, kind);
 
                         if (pkt_buf[0] == 'Z'){
                             dbg_sys_add_breakpoint(addr);
@@ -849,8 +850,9 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: g
 		 */
 		case 'g':
-                        cout << "g: read registers" << endl;
-                        printf("    PC: 0x%08x\n", state->registers[DBG_CPU_RISCV_PC]);
+
+			LOG_INFO("CMD - g: read registers");
+			LOG_INFO("    PC: 0x%08x", state->registers[DBG_CPU_RISCV_PC]);
 
 			/* Encode registers */
 			status = dbg_enc_hex(pkt_buf, sizeof(pkt_buf),
@@ -872,7 +874,7 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: G XX...
 		 */
 		case 'G':
-                        cout << "G: write registers" << endl;
+			LOG_INFO("CMD - g: write registers");
 			status = dbg_dec_hex(pkt_buf+1, pkt_len-1,
 			                     (char *)&(state->registers),
 			                     sizeof(state->registers));
@@ -894,7 +896,7 @@ int dbg_main(struct dbg_state *state)
 			ptr_next += 1;
 			token_expect_integer_arg(addr);
 
-                        cout << "p: read register" << addr << endl;
+			LOG_INFO("CMD - p: read register %d", addr);
 
 			if (addr >= DBG_CPU_RISCV_NUM_REGISTERS) {
 				goto error;
@@ -923,7 +925,7 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(addr);
 			token_expect_seperator('=');
 
-                        cout << "p: write register: " << addr << endl;
+			LOG_INFO("CMD - p: write register %d", addr);
 
 			if (addr < DBG_CPU_RISCV_NUM_REGISTERS) {
 				status = dbg_dec_hex(ptr_next, token_remaining_buf,
@@ -950,7 +952,7 @@ int dbg_main(struct dbg_state *state)
 			token_expect_seperator(',');
 			token_expect_integer_arg(length);
 
-                        printf("m: read memory: 0x%08x (length: %ld)\n", addr, length);
+                        LOG_INFO("CMD - m: read memory: 0x%08x (length: %ld)", addr, length);
 
 #if 0
                         // Return E01 when unable to read memory
@@ -984,7 +986,7 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(length);
 			token_expect_seperator(':');
                         
-                        printf("M: write memory: 0x%08x (length: %ld)\n", addr, length);
+                        LOG_INFO("CMD - M: write memory: 0x%08x (length: %ld)", addr, length);
 
                         // Return E01 when unable to read memory
 		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
@@ -1017,7 +1019,7 @@ int dbg_main(struct dbg_state *state)
 			token_expect_integer_arg(length);
 			token_expect_seperator(':');
 
-                        printf("X: write memory: 0x%08x (length: %ld)\n", addr, length);
+                        LOG_INFO("CMD - X: write memory: 0x%08x (length: %ld)", addr, length);
 
                         // Return E01 when unable to read memory
 		        ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x01);
@@ -1045,7 +1047,7 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: c [addr]
 		 */
 		case 'c':
-                        cout << "c: continue" << endl;
+			LOG_INFO("CMD - c : continue");
 
 			dbg_continue();
                         return 0;
@@ -1055,13 +1057,13 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: s [addr]
 		 */
 		case 's':
-                        cout << "s: step" << endl;
+			LOG_INFO("CMD - s : step");
 
 			dbg_step();
                         return 0;
 
 		case '?':
-                        cout << "?: get signal" << endl;
+			LOG_INFO("CMD - ? : get signal");
 
 			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
                         if (ret == EOF){
@@ -1072,6 +1074,9 @@ int dbg_main(struct dbg_state *state)
                 case '!':
                 case 'T':
                 case 'H':
+			LOG_INFO("CMD - %c", pkt_buf[0]);
+                        LOG_INFO("    Just reply OK");
+
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
                             return 0;
@@ -1082,7 +1087,7 @@ int dbg_main(struct dbg_state *state)
 		 * Unsupported Command
 		 */
 		default:
-                        cout << "Unsupported command: " << pkt_buf[0] << endl;
+			LOG_INFO("CMD - Unsupported command: %c", pkt_buf[0]);
 
 			ret = dbg_send_packet((const char *)NULL, 0);
                         if (ret == EOF){
@@ -1093,7 +1098,7 @@ int dbg_main(struct dbg_state *state)
 		continue;
 
 	error:
-                printf("Sending error packet...\n");
+		LOG_INFO("Sending error packet...");
 		ret = dbg_send_error_packet(pkt_buf, sizeof(pkt_buf), 0x00);
                 if (ret == EOF){
                     return 0;

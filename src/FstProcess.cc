@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "FstProcess.h"
+#include "Logger.h"
 
 FstProcess::FstProcess(string fstFileName) :
     fstFileName(fstFileName)
@@ -63,7 +64,7 @@ string FstProcess::infoStr(void)
 
     // FIXME: move...
     if (numDumpActivityChanges > 0){
-        cerr << "Blackout regions are not supported." << endl;
+        LOG_ERROR("Blackout regions are not supported.");
         exit(-2);
     }
 
@@ -85,19 +86,19 @@ bool FstProcess::assignHandles(vector<FstSignal *> &signals)
         switch(hier->htyp){
             case FST_HT_SCOPE: {
                 curScopeName = fstReaderPushScope(fstCtx, hier->u.scope.name, NULL);
-                //cout << "curScopeName: " << curScopeName << endl;
+                LOG_DEBUG("curScopeName: %s", curScopeName.c_str());
                 break;
             }
 
             case FST_HT_UPSCOPE: {
                 curScopeName = fstReaderPopScope(fstCtx);
-                //cout << "curScopeName: " << curScopeName << endl;
+                LOG_DEBUG("curScopeName: %s", curScopeName.c_str());
                 break;
             }
 
             case FST_HT_VAR: {
                 string curName = hier->u.var.name;
-                //cout << "curName: " << curName << endl;
+                LOG_DEBUG("curName: %s", curName.c_str());
 
                 sigNotFound = false;
                 for(auto sig: signals){
@@ -121,11 +122,11 @@ bool FstProcess::assignHandles(vector<FstSignal *> &signals)
 
 void FstProcess::reportSignalsNotFound(vector<FstSignal *> &signals)
 {
-    cerr << "Not all signals found..." << endl;
+    LOG_WARNING("Not all signals found...");
 
     for(auto sig: signals){
         if (!sig->hasHandle){
-            fprintf(stderr, "Signal not found: %s.%s\n", sig->scopeName.c_str(), sig->name.c_str());
+            LOG_WARNING("Signal not found: %s.%s\n", sig->scopeName.c_str(), sig->name.c_str());
         }
     }
 }

@@ -3,6 +3,7 @@
 #include <map>
 
 #include "TcpServer.h"
+#include "Logger.h"
 
 #include "gdbstub.h"
 #include "gdbstub_sys.h"
@@ -102,11 +103,11 @@ int dbg_sys_continue(void)
     while(cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
         address curAddr = cpuTrace->pcTraceIt->pc;
 
-        printf("PC: 0x%08x\n", curAddr);
+        LOG_INFO("PC: 0x%08x", curAddr);
 
         auto breakpointIt = breakpoints.find(curAddr);
         if (breakpointIt != breakpoints.end()){
-            printf("dbg_sys_continue: hit breakpoint at PC = 0x%08lx (time: %ld, %ld out of %ld)\n", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
+            LOG_INFO("dbg_sys_continue: hit breakpoint at PC = 0x%08lx (time: %ld, %ld out of %ld)", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
             break;
         }
 
@@ -114,7 +115,7 @@ int dbg_sys_continue(void)
     }
 
     if (cpuTrace->pcTraceIt == cpuTrace->pcTrace.end()){
-        printf("Reached end of execution!!!\n");
+        LOG_INFO("Reached end of execution!!!");
         cpuTrace->pcTraceIt = cpuTrace->pcTrace.end() -1;
     }
 
@@ -130,11 +131,11 @@ int dbg_sys_step(void)
         ++cpuTrace->pcTraceIt;
     }
     else{
-        printf("Reached end of execution!!!\n");
+        LOG_INFO("Reached end of execution!!!");
         cpuTrace->pcTraceIt = cpuTrace->pcTrace.end()-1;
     }
 
-    printf("dbg_sys_step: PC = 0x%08lx (time: %ld, %ld out of %ld)\n", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
+    LOG_INFO("dbg_sys_step: PC = 0x%08lx (time: %ld, %ld out of %ld)", cpuTrace->pcTraceIt->pc, cpuTrace->pcTraceIt->time, std::distance(cpuTrace->pcTrace.begin(), cpuTrace->pcTraceIt), cpuTrace->pcTrace.size());
 
     dbg_state.signum    = 0x05;         // SIGTRAP
     dbg_sys_update_state();
@@ -156,7 +157,7 @@ int dbg_sys_add_breakpoint(address addr)
 
     if (breakpointIt == breakpoints.end()){
         breakpoints[addr] = true;
-        printf(">>>>>>>>> Breakpoint added: 0x%08x. Nr of breakpoints: %ld\n", addr, breakpoints.size());
+        LOG_INFO(">>>>>>>>> Breakpoint added: 0x%08x. Nr of breakpoints: %ld", addr, breakpoints.size());
     }
     
     return 0;
@@ -168,7 +169,7 @@ int dbg_sys_delete_breakpoint(address addr)
 
     if (breakpointIt != breakpoints.end()){
         breakpoints.erase(breakpointIt);
-        printf("<<<<<<<<< Breakpoint deleted: 0x%08x. Nr of breakpoints: %ld\n", addr, breakpoints.size());
+        LOG_INFO("<<<<<<<<< Breakpoint deleted: 0x%08x. Nr of breakpoints: %ld", addr, breakpoints.size());
     }
 
     return 0;
