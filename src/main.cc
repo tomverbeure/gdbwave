@@ -143,7 +143,7 @@ void parseConfig(ifstream & configFile, ConfigParams &c)
             exit(1);
         }
 
-        LOG_INFO("name:%s", value.c_str());
+        LOG_INFO("%s:%s", name.c_str(), value.c_str());
     }
 }
 
