@@ -806,10 +806,10 @@ int dbg_main(struct dbg_state *state)
 			continue;
 		}
 
-                Logger::log().out(Logger::DebugLevel::INFO, "Received command:", true, false);
+                Logger::log().out(Logger::DebugLevel::DEBUG, "Received command:", true, false);
                 for(size_t c=0;c<pkt_len;++c){
                     string ch(1, pkt_buf[c]);
-                    Logger::log().out(Logger::DebugLevel::INFO, ch, false, c==pkt_len-1);
+                    Logger::log().out(Logger::DebugLevel::DEBUG, ch, false, c==pkt_len-1);
                 }
 
 		ptr_next = pkt_buf;
@@ -862,7 +862,7 @@ int dbg_main(struct dbg_state *state)
 			token_expect_seperator(',');
 			token_expect_integer_arg(kind);
 
-                        LOG_INFO("CMD - Z: is_hw:%d, addr: 0x%08x, kind: %d", is_hw, addr, kind);
+                        LOG_INFO("CMD - %c: breakpoint - is_hw:%d, addr: 0x%08x, kind: %d", pkt_buf[0], is_hw, addr, kind);
 
                         if (pkt_buf[0] == 'Z'){
                             dbg_sys_add_breakpoint(addr);
@@ -1081,7 +1081,7 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: c [addr]
 		 */
 		case 'c':
-			LOG_INFO("CMD - c : continue");
+			LOG_INFO("CMD - c: continue");
 
 			ret = dbg_continue();
                         if (ret == -1){
@@ -1099,7 +1099,7 @@ int dbg_main(struct dbg_state *state)
 		 * Command Format: s [addr]
 		 */
 		case 's':
-			LOG_INFO("CMD - s : step");
+			LOG_INFO("CMD - s: step");
 
 			ret = dbg_step();
 
@@ -1114,12 +1114,12 @@ int dbg_main(struct dbg_state *state)
                         return 0;
 
 		case 'k':
-			LOG_INFO("CMD - k : kill/restart");
+			LOG_INFO("CMD - k: kill/restart");
                         LOG_INFO("    No reply");
                         break;
 
 		case '?':
-			LOG_INFO("CMD - ? : query reason halted");
+			LOG_INFO("CMD - ?: query reason halted");
 
 			ret = dbg_send_signal_packet(pkt_buf, sizeof(pkt_buf), state->signum);
                         if (ret == EOF){
@@ -1128,7 +1128,7 @@ int dbg_main(struct dbg_state *state)
 			break;
 
                 case '!':
-			LOG_INFO("CMD - ! : enable extended mode");
+			LOG_INFO("CMD - !: enable extended mode");
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
@@ -1137,7 +1137,7 @@ int dbg_main(struct dbg_state *state)
                         break;
 
                 case 'T':
-			LOG_INFO("CMD - T : is thread alive?");
+			LOG_INFO("CMD - T: is thread alive?");
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
@@ -1146,7 +1146,7 @@ int dbg_main(struct dbg_state *state)
                         break;
 
                 case 'H':
-			LOG_INFO("CMD - H : set thread");
+			LOG_INFO("CMD - H: set thread");
 
 			ret = dbg_send_ok_packet(pkt_buf, sizeof(pkt_buf));
                         if (ret == EOF){
