@@ -9,6 +9,8 @@ using namespace std;
 #include "RegFileTrace.h"
 #include "Logger.h"
 
+extern bool verbose;
+
 RegFileTrace::RegFileTrace(FstProcess & fstProc, FstSignal clk, FstSignal memWr, FstSignal memAddr, FstSignal memWrData) :
     fstProc(fstProc), 
     clk(clk),
@@ -26,8 +28,12 @@ static void memChangedCB(uint64_t time, FstSignal *signal, const unsigned char *
     if (strstr((char *)value, "x") || strstr((char *)value, "z")){
         return;
     }
+
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
+
+#if 0
     LOG_DEBUG("%ld, %ud, %s, %s, %ld", time, signal->handle, signal->name.c_str(), value, valueInt);
+#endif
 
     if (signal->handle == regFileTrace->memWr.handle){
         regFileTrace->curMemWr      = valueInt;
@@ -47,7 +53,7 @@ static void memChangedCB(uint64_t time, FstSignal *signal, const unsigned char *
     // All signals changes on the rising edge of the clock. Everything is stable at the falling edge...
     if (signal->handle == regFileTrace->clk.handle && valueInt == 0){
         if (regFileTrace->curMemWr){
-            LOG_INFO("RegWr: 0x%08lx <- 0x%08lx (@%ld)", regFileTrace->curMemAddr, regFileTrace->curMemWrData, time);
+            if (verbose) LOG_INFO("RegWr: 0x%08lx <- 0x%08lx (@%ld)", regFileTrace->curMemAddr, regFileTrace->curMemWrData, time);
 
             RegFileAccess   mem = { time, regFileTrace->curMemWr, regFileTrace->curMemAddr, regFileTrace->curMemWrData };
             regFileTrace->regFileTrace.push_back(mem);

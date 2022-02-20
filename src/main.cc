@@ -19,6 +19,8 @@
 
 using namespace std;
 
+bool verbose = false;
+
 struct ConfigParams {
     string fstFileName; 
     string cpuClkSignal;
@@ -151,7 +153,7 @@ void parseConfig(ifstream & configFile, ConfigParams &c)
 int main(int argc, char **argv)
 {
     int c;
-    Logger::log().setDebugLevel(Logger::INFO);
+    Logger::log().setDebugLevel(Logger::DEBUG);
     Logger::log().setLogFile("./gdbwave.log");
 
     ConfigParams configParams;
@@ -174,6 +176,9 @@ int main(int argc, char **argv)
                 break;
             case 'p':
                 portNr = stoi(optarg);
+                break;
+            case 'v':
+                verbose = true;
                 break;
             case '?':
                 return 1;

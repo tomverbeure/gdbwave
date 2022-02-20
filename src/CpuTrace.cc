@@ -8,6 +8,8 @@ using namespace std;
 #include "CpuTrace.h"
 #include "Logger.h"
 
+extern bool verbose;
+
 CpuTrace::CpuTrace(FstProcess & fstProc, FstSignal clk, FstSignal pcValid, FstSignal pc) :
     fstProc(fstProc), 
     clk(clk),
@@ -26,7 +28,10 @@ static void pcChangedCB(uint64_t time, FstSignal *signal, const unsigned char *v
     }
 
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
+
+#if 0
     LOG_DEBUG("%ld, %ud, %s, %s, %ld", time, signal->handle, signal->name.c_str(), value, valueInt);
+#endif
 
     if (signal->handle == cpuTrace->pcValid.handle){
         cpuTrace->curPcValidVal   = valueInt;
@@ -41,7 +46,8 @@ static void pcChangedCB(uint64_t time, FstSignal *signal, const unsigned char *v
     // All signals changes on the rising edge of the clock. Everything is stable at the falling edge...
     if (signal->handle == cpuTrace->clk.handle && valueInt == 0){
         if (cpuTrace->curPcValidVal){
-            LOG_INFO("instr retire: %ld, %08lx", time, cpuTrace->curPcVal);
+
+            if (verbose) LOG_INFO("instr retire: %ld, %08lx", time, cpuTrace->curPcVal);
 
             PcValue     pc = { time, cpuTrace->curPcVal };
             cpuTrace->pcTrace.push_back(pc);

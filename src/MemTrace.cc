@@ -10,6 +10,8 @@ using namespace std;
 #include "MemTrace.h"
 #include "Logger.h"
 
+extern bool verbose;
+
 MemTrace::MemTrace(FstProcess & fstProc, string memInitFileName, int memInitStartAddr,  
                 FstSignal clk, 
                 FstSignal memCmdValid, FstSignal memCmdReady, FstSignal memCmdAddr, FstSignal memCmdSize, FstSignal memCmdWr, FstSignal memCmdWrData,
@@ -43,7 +45,10 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
     }
 
     uint64_t valueInt = stol(string((const char *)value), nullptr, 2);
+
+#if 0
     LOG_DEBUG("%ld, %ud, %s, %s, %ld", time, signal->handle, signal->name.c_str(), value, valueInt);
+#endif
 
     if (signal->handle == memCmdValid.handle){
         curMemCmdValid      = valueInt;
@@ -102,7 +107,7 @@ void MemTrace::processSignalChanged(uint64_t time, FstSignal *signal, const unsi
                         uint64_t byteVal    = (curMemCmdWrData >> (byteNr * 8)) & 255;
                         uint64_t addr       = (curMemCmdAddr & ~3) | byteNr;
 
-                        LOG_INFO("MemWr: 0x%08lx <- 0x%02lx (@%ld)", addr, byteVal, time);
+                        if (verbose) LOG_INFO("MemWr: 0x%08lx <- 0x%02lx (@%ld)", addr, byteVal, time);
 
                         MemAccess   ma = { time, curMemCmdWr, addr, byteVal }; 
                         memTrace.push_back(ma);
