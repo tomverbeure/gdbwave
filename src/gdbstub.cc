@@ -277,23 +277,26 @@ int dbg_send_packet(const char *pkt_data, size_t pkt_len)
 	char buf[3];
 	char csum;
 
+        Logger::log().out(Logger::DebugLevel::DEBUG, "Resp: $", true, false);
+
 	/* Send packet start */
 	if (dbg_sys_putchar('$') == EOF) {
 		return EOF;
 	}
 
-#if DEBUG
+#if 1
 	{
 		size_t p;
-		LOG_DEBUG("-> ");
 		for (p = 0; p < pkt_len; p++) {
 			if (dbg_is_printable_char(pkt_data[p])) {
-				LOG_DEBUG("%c", pkt_data[p]);
+				string ch(1, pkt_data[p]);
+				Logger::log().out(Logger::DebugLevel::DEBUG, ch, false, false);
 			} else {
-				LOG_DEBUG("\\x%02x", pkt_data[p]&0xff);
+                            	char str[10];
+                                sprintf(str, "\\x%02x", pkt_data[p]&0xff);
+				Logger::log().out(Logger::DebugLevel::DEBUG, str, false, false);
 			}
 		}
-		LOG_DEBUG("");
 	}
 #endif
 
@@ -304,9 +307,15 @@ int dbg_send_packet(const char *pkt_data, size_t pkt_len)
 
 	/* Send the checksum */
 	buf[0] = '#';
+
 	csum = dbg_checksum(pkt_data, pkt_len);
-	if ((dbg_enc_hex(buf+1, sizeof(buf)-1, &csum, 1) == EOF) ||
-		(dbg_write(buf, sizeof(buf)) == EOF)) {
+	if (dbg_enc_hex(buf+1, sizeof(buf)-1, &csum, 1) == EOF){
+                return EOF;
+        }
+
+	Logger::log().out(Logger::DebugLevel::DEBUG, buf, false, true);
+
+        if (dbg_write(buf, sizeof(buf)) == EOF) {
 		return EOF;
 	}
 
@@ -422,6 +431,7 @@ int dbg_enc_hex(char *buf, size_t buf_len, const char *data, size_t data_len)
 		*buf++ = dbg_get_digit((data[pos] >> 4) & 0xf);
 		*buf++ = dbg_get_digit((data[pos]     ) & 0xf);
 	}
+        *buf = '\0';
 
 	return data_len*2;
 }
@@ -796,7 +806,9 @@ int dbg_main(struct dbg_state *state)
 
 	while (1) {
 		/* Receive the next packet */
-		status = dbg_recv_packet(pkt_buf, sizeof(pkt_buf), &pkt_len);
+		status = dbg_recv_packet(pkt_buf, sizeof(pkt_buf)-1, &pkt_len);
+                pkt_buf[pkt_len] = '\0';
+
 		if (status == EOF) {
 			break;
 		}
@@ -1153,6 +1165,57 @@ int dbg_main(struct dbg_state *state)
                             return -1;
                         }
                         break;
+
+		case 'v': 
+                        LOG_INFO("CMD - v: %s", pkt_buf);
+
+                        if (0 == strncmp(pkt_buf, "vCont?", pkt_len)){
+                            char vContResp[] = "vCont;c;C;s;S";
+                            LOG_INFO("Resp: %s", vContResp);
+                            ret = dbg_send_packet(vContResp, strlen(vContResp));
+                            if (ret == EOF){
+                                return -1;
+                            }
+                            break;
+                        }   
+
+                        if (0 == strncmp(pkt_buf, "vCont;", 6)){
+                            unsigned int p=6;
+                            while(p < pkt_len){
+                                if (pkt_buf[p] == 's'){
+                                    LOG_DEBUG("dbg_step");
+                                    ret = dbg_step();
+                                    if (ret == -1){
+                                        // Reached last instruction. Send back Terminated
+			                ret = dbg_send_terminated_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+                                        if (ret == EOF){
+                                            return -1;
+                                        }
+                                    }
+                                    return 0;
+                                }
+                                else if (pkt_buf[p] == 'c'){
+                                    LOG_DEBUG("dbg_continue");
+                                    ret = dbg_continue();
+                                    if (ret == -1){
+                                        // Reached last instruction. Send back Terminated
+			                ret = dbg_send_terminated_packet(pkt_buf, sizeof(pkt_buf), state->signum);
+                                        if (ret == EOF){
+                                            return -1;
+                                        }
+                                    }
+                                    return 0;
+                                }
+                                ++p;
+
+                                while(p < pkt_len && pkt_buf[p++] != ';'){
+                                }
+                            }
+
+                            return 0;
+                        }
+                
+                        // Fall through to supported command...
 
 		/*
 		 * Unsupported Command

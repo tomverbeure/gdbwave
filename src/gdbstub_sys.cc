@@ -136,8 +136,6 @@ int dbg_sys_continue(void)
     while(cpuTrace->pcTraceIt != cpuTrace->pcTrace.end()){
         address curAddr = cpuTrace->pcTraceIt->pc;
 
-        print_pc(cpuTrace);
-
         auto breakpointIt = breakpoints.find(curAddr);
         if (breakpointIt != breakpoints.end()){
             LOG_INFO("Hit breakpoint %ld at PC = 0x%08lx", std::distance(breakpoints.begin(), breakpointIt), cpuTrace->pcTraceIt->pc);
@@ -145,6 +143,7 @@ int dbg_sys_continue(void)
         }
 
         ++cpuTrace->pcTraceIt;
+        print_pc(cpuTrace);
     }
 
     if (cpuTrace->pcTraceIt == cpuTrace->pcTrace.end()){
