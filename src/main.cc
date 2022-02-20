@@ -81,6 +81,7 @@ void help()
     LOG_INFO("Usage: gdbwave <options>");
     LOG_INFO("    -w <FST waveform file>");
     LOG_INFO("    -c <config parameter file>");
+    LOG_INFO("    -p <port nr>");
     LOG_INFO("    -v verbose");
     LOG_INFO("");
     LOG_INFO("Example: ./gdbwave -w ./test_data/top.fst -c ./test_data/configParams.txt");
@@ -154,11 +155,12 @@ int main(int argc, char **argv)
     Logger::log().setLogFile("./gdbwave.log");
 
     ConfigParams configParams;
+    int portNr = 3333;
 
     string fstFileName; 
     string configParamsFileName;
 
-    while((c = getopt(argc, argv, "hw:c:v")) != -1){
+    while((c = getopt(argc, argv, "hw:c:p:v")) != -1){
         switch(c){
             case 'h':
                 help();
@@ -169,6 +171,9 @@ int main(int argc, char **argv)
                 break;
             case 'c':
                 configParamsFileName = optarg;
+                break;
+            case 'p':
+                portNr = stoi(optarg);
                 break;
             case '?':
                 return 1;
@@ -241,7 +246,7 @@ int main(int argc, char **argv)
                              memCmdValidSig, memCmdReadySig, memCmdAddrSig, memCmdSizeSig, memCmdWrSig, memCmdWrDataSig, 
                              memRspValidSig, memRspDataSig);
 
-    TcpServer tcpServer(3333);
+    TcpServer tcpServer(portNr);
     dbg_sys_init(tcpServer, cpuTrace, regFileTrace, memTrace);
 
     return 0;
