@@ -2,7 +2,7 @@
 
 GDB server to debug CPU simulation waveform traces.
 
-See [GDBWave - A Post-Simulation Waveform-Based RISC-V GDB Debugging Server](https://tomverbeure.github.io/2022/02/22/GDBWave-Post-Simulation-RISCV-SW-Debugging.html).
+See [GDBWave - A Post-Simulation Waveform-Based RISC-V GDB Debugging Server](https://tomverbeure.github.io/2022/02/20/GDBWave-Post-Simulation-RISCV-SW-Debugging.html).
 
 # Usage
 
