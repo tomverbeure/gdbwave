@@ -82,7 +82,7 @@ void RegFileTrace::init()
 
     fstProc.getValueChanges(sigs, memChangedCB, (void *)this);
 
-    LOG_INFO("Nr mem transactions: %ld", regFileTrace.size());
+    LOG_INFO("Nr regfile write transactions: %ld", regFileTrace.size());
 }
 
 

@@ -159,7 +159,7 @@ void MemTrace::init()
 
     fstProc.getValueChanges(sigs, memChangedCB, (void *)this);
 
-    LOG_INFO("Nr mem transactions: %ld", memTrace.size());
+    LOG_INFO("Nr mem write transactions: %ld", memTrace.size());
 }
 
 

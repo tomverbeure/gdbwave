@@ -194,5 +194,4 @@ int             fstReaderGetFacProcessMask(void *ctx, fstHandle facidx);
 * Support complex memory maps
 * Decode register file and memory reads
 * Support for RISC-V instruction tracing decompression
-* 'R' should work.
 

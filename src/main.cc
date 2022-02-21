@@ -153,7 +153,7 @@ void parseConfig(ifstream & configFile, ConfigParams &c)
 int main(int argc, char **argv)
 {
     int c;
-    Logger::log().setDebugLevel(Logger::DEBUG);
+    Logger::log().setDebugLevel(Logger::INFO);
     Logger::log().setLogFile("./gdbwave.log");
 
     ConfigParams configParams;
